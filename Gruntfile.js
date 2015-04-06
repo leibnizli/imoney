@@ -13,7 +13,7 @@ module.exports = function(grunt) {
         uglify: {
             //文件头部输出信息
             options: {
-                banner: '/**\n * Name: <%= pkg.name %>\n * Author: <%= pkg.author %>\n * Url: <%= pkg.url%>\n * Time: <%= grunt.template.today("yyyy-mm-dd h:MM:ss TT") %> \n*/\n',
+                banner: '/**\n * Name: <%= pkg.name %> <%= pkg.version %>\n * Author: <%= pkg.author %>\n * Url: <%= pkg.url%>\n * Time: <%= grunt.template.today("yyyy-mm-dd h:MM:ss TT") %> \n*/\n',
                 beautify: {
                     //中文ascii化，非常有用！防止中文乱码的神配置
                     ascii_only: true

@@ -1,1180 +1,587 @@
 /**
- * Name: iMoney.js
- * Author: 坦克
+ * Name: iMoney.js v1.1.0
+ * Author: Thunk
  * Url: http://www.w3cmm.com/
  * Time: 2014-04-04 4:09:00 PM 
 */
-(function () {
-    if (!window.iMoney) {
-        window["iMoney"] = {}
-    }
-
-    //能力检测
-    function isCompatible(other) {
-        // 使用能力检测来检查必要的条件
-        if (other === false || !Array.prototype.push || !Object.hasOwnProperty || !document.createElement || !document.getElementsByTagName) {
-            alert('isCompatible 检测失败或不正常！');
-            return false;
-        }
-        return true;
-    }
-    window["iMoney"]['isCompatible'] = isCompatible;
-
-    //选择器
-    function $() {
-        var elements = new Array();
-        for (var i = 0; i < arguments.length; i++) {
-            var element = arguments[i];
-            if (typeof element == "string") {
-                element = document.getElementById(element);
-            }
-            //如果只提供了一个参数，则立即返回这个元素
-            if (arguments.length == 1) {
-                return element;
-            }
-            elements.push(element);
-        }
-        return elements;
+(function(window, undefined) {
+    var rootiMoney,
+        _iMoney = window.iMoney,
+        // $被覆盖的时候
+        _$ = window.$,
+        class2type = {},
+        core_version = "1.1.0",
+        emptyArray = [],
+        core_filter = emptyArray.filter,
+        core_concat = emptyArray.concat,
+        core_push = emptyArray.push,
+        core_slice = emptyArray.slice,
+        core_indexOf = emptyArray.indexOf,
+        core_some = emptyArray.some;
+        core_toString = class2type.toString,
+        core_hasOwn = class2type.hasOwnProperty,
+        core_trim = core_version.trim,
+        //用来排除空白字符
+        core_rnotwhite = /\S+/g,
+        //匹配<tag>text, <tag>text</tag>text或#id文本, 也就是$("htmlText")和$("#id")用法
+        rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/,
+        //匹配标签<b></b>或<br />
+        rsingleTag = /^<(\w+)\s*\/?>(?:<\/\1>|)$/;
+    var iMoney = function(selector, context) {
+        return new iMoney.fn.init(selector, context, rootiMoney);
     };
-    window["iMoney"]["$"] = $;
-
-    //选择类
-    function getElementsByClassName(className, tag, parent) {
-        parent = parent || document;
-        if (!(parent = $(parent))) {
-            return false;
-        }
-        //查找所有匹配的标签
-        var allTags = (tag == "*" && parent.all) ? parent.all : parent.getElementsByTagName(tag);
-        var matchingElements = new Array();
-        //创建正则表达式，来判断className是否正确
-        className = className.replace(/\-/g, "\\-");
-        var regex = new RegExp("(^|\\s)" + className + "(\\s|$)");
-        var element;
-        //检查每个元素
-        for (var i = 0; i < allTags.length; i++) {
-            element = allTags[i];
-            if (regex.test(element.className)) {
-                matchingElements.push(element);
+    iMoney.fn = iMoney.prototype = {
+        constructor: iMoney,
+        imoney: core_version,
+        init: function(selector, context, rootiMoney) {
+            var match, elem;
+            if (!selector) {
+                return this;
             }
-        }
-        //返回任何匹配的元素
-        return matchingElements;
-    };
-    window["iMoney"]["getElementsByClassName"] = getElementsByClassName;
-
-    //通过ID修改单个元素的样式
-    function setStyleById(element, styles) {
-        if (!(element = $(element))) {
-            return false;
-        }
-        for (property in styles) {
-            if (!styles.hasOwnProperty(property)) continue;
-            if (element.style.setProperty) {
-                element.style.setProperty(uncamelize(property, "-"), styles[property], null);
-            } else {
-                //备用方法
-                element.style[camelize(property)] = styles[property];
-            }
-        }
-        return true;
-    }
-    window["iMoney"]["setStyle"] = setStyleById;
-    window["iMoney"]["setStyleById"] = setStyleById;
-
-
-    //通过类名修改多个元素的样式
-    function setStylesByClassName(parent, tag, className, styles) {
-        if (!(parent = $(parent))) {
-            return false;
-        }
-        var elements = getElementsByClassName(className, tag, parent);
-        for (var e = 0; e < elements.length; e++) {
-            setStyleById(elements[e], styles);
-        }
-        return true;
-    }
-    window["iMoney"]["setStylesByClassName"] = setStylesByClassName;
-
-    //通过标签名修改元素的样式
-    function setStylesByTagName(tagname, styles, parent) {
-        parent = $(parent) || document;
-        var elements = parent.getElementsByTagName(tagname);
-        for (var e = 0; e < elements.length; e++) {
-            setStyleById(elements[e], styles);
-        }
-    }
-    window["iMoney"]["setStylesByTagName"] = setStylesByTagName;
-
-    //在指定样式表指定位置插入规则
-    function insertRule(sheet, selectorText, cssText, position) {
-        if (sheet.insertRule) {
-            sheet.insertRule(selectorText + "{" + cssText + "}", position);
-        } else if (sheet.addRule) {
-            sheet.addRule(selectorText, cssText, position);
-        }
-    }
-
-    //在指定样式表指定位置删除规则
-    function deleteRule(sheet, index) {
-        if (sheet.deleteRule) {
-            sheet.deleteRule(index);
-        } else if (sheet.removeRule) {
-            sheet.removeRule(index);
-        }
-    }
-
-    //取得包含元素类名的数组
-    function getClass(element) {
-        if (!(element = $(element))) return false;
-        return element.className.replace(/\s+/, " ").split(" ");
-    }
-    window["iMoney"]["getClass"] = getClass;
-
-    //检查元素中是否存在某个类
-    function hasClass(element, className) {
-        if (!(element = $(element))) return false;
-        var classes = getClass(element);
-        for (var i = 0; i < classes.length; i++) {
-            if (classs[i] == className) {
-                return true;
-            }
-        }
-        return false;
-    }
-    window["iMoney"]["hasClass"] = hasClass;
-
-    //为元素添加类
-    function addClass(element, className) {
-        if (!(element = $(element))) return false;
-        element.className += (element.className ? " " : "") + className;
-        return true;
-    }
-    window["iMoney"]["addClass"] = addClass;
-
-    //从元素删除类
-    function removeClass(element, className) {
-        if (!(element = $(element))) return false;
-        var classes = getClass(element);
-        var length = classes.length;
-        for (var i = length - 1; i >= 0; i--) {
-            if (classes[i] === className) {
-                delete(classes[i]);
-            }
-        }
-        element.className = classes.join(" ");
-        alert(classes.length)
-        return(length == classes.length ? false : true);
-    }
-    window["iMoney"]["removeClass"] = removeClass;
-
-    //添加样式表
-    function addStylesSheet(url, media) {
-        media = media || "screen";
-        var link = document.createElement("link");
-        link.setAttribute("rel", "stylesheet");
-        link.setAttribute("type", "text/css");
-        link.setAttribute("href", url);
-        link.setAttribute("media", media);
-        document.getElementsByTagName("head")[0].appendChild(link);
-    }
-    window["iMoney"]["addStylesSheet"] = addStylesSheet;
-
-    //移除样式表
-    function removeStyleSheet(url, media) {
-        var styles = getStyleSheets(url, media);
-        alert(styles.length)
-        for (var i = 0; i < styles.length; i++) {
-            var node = styles[i].ownerNode || styles[i].owningElement;
-            //禁用样式表
-            styles[i].disabled = true;
-            node.parentNode.removeChild(node);
-        }
-    }
-    window["iMoney"]["removeStyleSheet"] = removeStyleSheet;
-
-    //载入JavaScript文件
-    function loadScript(url) {
-        var script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.async = true;
-        script.src = url;
-        document.body.appendChild(script)
-    }
-    window["iMoney"]["loadScript"] = loadScript;
-
-    //执行JavaScript代码
-    function loadScriptString(code) {
-        var script = document.createElement("script");
-        script.type = "text/javascript";
-        try {
-            script.appendChild(document.createTextNode(code));
-        } catch (ex) {
-            script.text = code;
-        }
-        document.body.appendChild(script);
-    }
-    window["iMoney"]["loadScriptString"] = loadScriptString;
-
-    //载入样式表
-    function loadStyle(url) {
-        var link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.type = "tet/css";
-        link.href = url;
-        var head = document.getElementsByTagName("head")[0];
-        head.appendChild(link);
-    }
-    window["iMoney"]["loadStyle"] = loadStyle;
-
-    //向页面添加样式
-    function loadStyleString(css) {
-        var style = document.createElement("style");
-        style.type = "text/css";
-        try {
-            style.appendChild(document.createTextNode(css));
-        } catch (ex) {
-            style.styleSheet.cssText = css;
-        }
-        var head = document.getElementsByTagName("head")[0];
-        head.appendChild(style);
-    }
-    window["iMoney"]["loadStyleString"] = loadStyleString;
-
-    //通过URL取得包含所有样式的数组
-    function getStyleSheets(url, media) {
-        var sheets = [];
-        for (var i = 0; i < document.styleSheets.length; i++) {
-            if (url && document.styleSheets[i].href.indexOf(url) == -1) {
-                continue;
-            }
-            if (media) {
-                media = media.replace(/,\s*/, ",");
-                var sheetMedia;
-                if (document.styleSheets[i].media.mediaText) {
-
-                    //DOM方法
-                    sheetMedia = document.styleSheets[i].media.mediaText.replace(/,\s*/, ",");
-                    //Safari会添加额外的逗号和空格
-                    sheetMedia = sheetMedia.replace(/,\s*/, ",");
+            if (typeof selector === "string") {
+                //如果是由"<"和">"包裹的HTML片段
+                if (selector.charAt(0) === "<" && selector.charAt(selector.length - 1) === ">" && selector.length >= 3) {
+                    match = [null, selector, null];
                 } else {
-                    //MSIE方法
-                    sheetMedia = document.styleSheets[i].media.replace(/,\s*/, ",");
+                    match = rquickExpr.exec(selector);
                 }
-                if (media != sheetMedia) {
-                    continue;
-                }
-            }
-            sheets.push(document.styleSheets[i]);
-        }
-        return sheets;
-    }
-    window["iMoney"]["getStyleSheets"] = getStyleSheets;
-
-    //把word-word转换成wordWord
-    function camelize(s) {
-        return s.replace(/-(\w)/g, function (strMatch, p1) {
-            return p1.toUpperCase();
-        });
-    }
-    window["iMoney"]['camelize'] = camelize;
-
-    //把wordWord转换成word-word
-    function uncamelize(s, sep) {
-        sep = sep || "-";
-        return s.replace(/([a-z])([A-Z])/g, function (strMatch, p1, p2) {
-            return p1 + sep + p2.toLowerCase();
-        })
-    }
-    window["iMoney"]["uncamelize"] = uncamelize;
-
-    //获取元素的样式
-    function getStyle(element, property) {
-        if (!(element = $(element)) && !property) {
-            return false
-        }
-        var value = element.style[camelize(property)];
-        if (!value) {
-            if (document.defaultView && document.defaultView.getComputedStyle) {
-                var css = document.defaultView.getComputedStyle(element, null);
-                value = css ? css.getPropertyValue(property) : null;
-            } else if (element.currentStyle) {
-                value = element.currentStyle[camelize(property)];
-            }
-        }
-        return value == "auto" ? " " : value;
-    }
-    window["iMoney"]["getStyle"] = getStyle;
-    window["iMoney"]["getStyleById"] = getStyle;
-
-    //切换显示
-    function toggleDisplay(node, value) {
-        if (!(node = $(node))) {
-            return false;
-        }
-        if (node.style.display != "none") {
-            node.style.display = "none";
-        } else {
-            node.style.display = value || " ";
-        }
-        return true;
-    }
-    window["iMoney"]["toggleDisplay"] = toggleDisplay;
-
-    //检测otherNode是否refNode的子节点
-    function contains(refNode, otherNode) {
-        if (typeof refNode.contains == "function" &&
-            (!client.engine.webkit || client.engine.webkit >= 522)) {
-            return refNode.contains(otherNode);
-        } else if (typeof refNode.compareDocumentPosition == "function") {
-            return !!(refNode.compareDocumentPosition(otherNode) & 16);
-        } else {
-            var node = otherNode.parentNode;
-            do {
-                if (node === refNode) {
-                    return true;
-                } else {
-                    node = node.parentNode;
-                }
-            } while (node !== null);
-            return false;
-        }
-    }
-    window["iMoney"]["contains"] = contains;
-
-    //在后面插入节点
-    function insertAfter(node, referenceNode) {
-        if (!(node = $(node))) {
-            return false;
-        }
-        if (!(referenceNode = $(referenceNode))) {
-            return false;
-        }
-        return referenceNode.parentNode.insertBefore(node, referenceNode.nextSibling);
-    }
-    window["iMoney"]["insertAfter"] = insertAfter;
-
-    //移除节点
-    function removeChildren(parent) {
-        if (!(parent = $(parent))) {
-            return false;
-        }
-        //当存在子节点时删除该子节点
-        while (parent.firstChild) {
-            parent.firstChild.parentNode.removeChild(parent.children);
-        }
-        return parent;
-    }
-    window["iMoney"]["removeChildren"] = removeChildren;
-
-    //在前面插入节点
-    function prependChild(parent, newChild) {
-        if (!(parent = $(parent))) {
-            return false;
-        }
-        if (!(newChild = $(newChild))) {
-            return false;
-        }
-        if (parent.firstChild) {
-            //如果存在子节点，则在这个节点之前插入
-            parent.insertBefore(newChild, parent.firstChild);
-        } else {
-            //如果没有子节点则直接添加
-            parent.appendChild(newChild);
-        }
-        //再返回父元素
-        return parent;
-    }
-    window["iMoney"]["prependChild"] = prependChild;
-
-    //重复一个字符串
-    if (!String.repeat) {
-        String.prototype.repeat = function (l) {
-            return new Array(l + 1).join(this);
-        }
-    }
-    //清除结尾和开头处的空白符
-    if (!String.trim) {
-        String.prototype.trim = function () {
-            return this.replace(/^\s+|\s+$/g, "")
-        }
-    }
-
-    //获取元素的左偏移
-    function getElementLeft(element) {
-        var actualLeft = element.offsetLeft;
-        var current = element.offsetParent;
-
-        while (current !== null) {
-            actualLeft += current.offsetLeft;
-            current = current.offsetParent;
-        }
-
-        return actualLeft;
-    }
-    window["iMoney"]["getElementLeft"] = getElementLeft;
-
-    //获取元素的上 偏移
-    function getElementTop(element) {
-        var actualTop = element.offsetTop;
-        var current = element.offsetParent;
-
-        while (current !== null) {
-            actualTop += current.offsetTop;
-            current = current.offsetParent;
-        }
-
-        return actualTop;
-    }
-    window["iMoney"]["getElementTop"] = getElementTop;
-
-    //获取视口大小
-    function getViewport() {
-        if (document.compatMode == "BackCompat") {
-            return {
-                width: document.body.clientWidth,
-                height: document.body.clientHeight
-            };
-        } else {
-            return {
-                width: document.documentElement.clientWidth,
-                height: document.documentElement.clientHeight
-            };
-        }
-    }
-    window["iMoney"]["getViewport"] = getViewport;
-
-    //获取浏览器窗口大小
-    function getBrowserWindowSize() {
-        var de = document.documentElement;
-        return {
-            'width': (window.innerWidth || (de && de.clientWidth) || document.body.clientWidth),
-            'height': (window.innerHeight || (de && de.clientHeight) || document.body.clientHeight)
-        }
-    }
-    window["iMoney"]["getBrowserWindowSize"] = getBrowserWindowSize;
-
-    //获取文档尺寸
-    function getDocSize() {
-        return {
-            "width": Math.max(document.documentElement.scrollHeight, document.documentElement)
-        }
-    }
-
-    //获取鼠标的位置坐标
-    function getPointerPositionInDocument(event) {
-        event = event || getEvent(event);
-        var x = event.pageX || (event.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft));
-        var y = event.pageY || (event.clientY + (document.documentElement.scrollTop || document.body.scrollTop));
-        return {
-            "x": x,
-            "y": y
-        };
-    }
-    window["iMoney"]["getPointerPositionInDocument"] = getPointerPositionInDocument;
-
-    //获取元素上、下、左、右的距离
-    function getBoundingClientRect(element) {
-
-        var scrollTop = document.documentElement.scrollTop;
-        var scrollLeft = document.documentElement.scrollLeft;
-
-        if (element.getBoundingClientRect) {
-            if (typeof arguments.callee.offset != "number") {
-                var temp = document.createElement("div");
-                temp.style.cssText = "position:absolute;left:0;top:0;";
-                document.body.appendChild(temp);
-                arguments.callee.offset = -temp.getBoundingClientRect().top - scrollTop;
-                document.body.removeChild(temp);
-                temp = null;
-            }
-
-            var rect = element.getBoundingClientRect();
-            var offset = arguments.callee.offset;
-
-            return {
-                left: rect.left + offset,
-                right: rect.right + offset,
-                top: rect.top + offset,
-                bottom: rect.bottom + offset
-
-            };
-        } else {
-
-            var actualLeft = getElementLeft(element);
-            var actualTop = getElementTop(element);
-
-            return {
-                left: actualLeft - scrollLeft,
-                right: actualLeft + element.offsetWidth - scrollLeft,
-                top: actualTop - scrollTop,
-                bottom: actualTop + element.offsetHeight - scrollTop
-            }
-        }
-    }
-    window["iMoney"]["getBoundingClientRect"] = getBoundingClientRect;
-
-    //绑定事件
-    function addHandler(element, type, Handler) {
-        if (element.addEventListener) {
-            element.addEventListener(type, Handler, false);
-        } else if (element.attachEvent) {
-            element['e' + type + Handler] = Handler;
-            element[type + Handler] = function () {
-                element['e' + type + Handler](window.event);
-            }
-            element.attachEvent('on' + type, element[type + Handler]);
-        }
-        //return false;
-    }
-    window["iMoney"]["addHandler"] = addHandler;
-
-    //移除事件
-    function removeHandler(node, type, listener) {
-        if (node.removeEventListener) {
-            node.removeEventListener(type, listener, false);
-            return true;
-        } else if (node.detachEvent) {
-            // MSIE method
-            node.detachEvent('on' + type, node[type + listener]);
-            node[type + listener] = null;
-            return true;
-        }
-        // Didn't have either so return false
-        return false;
-    }
-    window["iMoney"]["removeHandler"] = removeHandler;
-
-    //获取事件
-    function getEvent(event) {
-        return event ? event : window.event;
-    }
-    window["iMoney"]["getEvent"] = getEvent;
-
-    //获取事件对象
-    function getTarget() {
-        return event.target || event.srcElement;
-    }
-    window["iMoney"]["getTarget"] = getTarget;
-
-    //阻止默认事件
-    function preventDefault(event) {
-        if (event.preventDefault) {
-            event.preventDefault();
-        } else {
-            event.returnValue = false;
-        }
-    }
-    window["iMoney"]["preventDefault"] = preventDefault;
-
-    //阻止冒泡
-    function stopPropagation(event) {
-        if (event.stopPropagation) {
-            event.stopPropagation();
-        } else {
-            event.cancelBubble = true;
-        }
-    }
-    window["iMoney"]["stopPropagation"] = stopPropagation;
-
-    //load事件
-    function addLoadEvent(loadEvent, waitForImages) {
-        //如果需要等待图片载入则使用常规的添加事件方法
-        if (waitForImages) {
-            return addEvent(window, "load", loadEvent);
-        }
-        var init = function () {
-            //如果这个函数已经被调用过了则返回
-            if (arguments.callee.done) return;
-            //标记这个函数以便检验它是否运行过
-            arguments.callee.done = true;
-            //在document的环境中运行载入事件
-            loadEvent.apply(document, arguments);
-        };
-        //DOMContLoaded事件会在文档标记被载入完成时被调用
-        if (document.addEventListener) {
-            document.addEventListener("DOMContentLoaded", init, false);
-        }
-        //对于Safari使用setInterval()函数检测document的readyState属性，监控文档是否完成
-        if (/Webkit/i.test(navigator.userAgent)) {
-            var _timer = setInterval(function () {
-                if (/loaded|complete/.test(document.readyState)) {
-                    clearInterval(_timer);
-                    init();
-                }
-            }, 10);
-        }
-        //写入script标签，该标签会延迟到文档的最后载入
-        //然后，使用script对象的onreadystatechange方法进行类似的readyState检查后载入事件
-        /*@if (@_win32)
-         document.write("<script id=_ie_onload defer src=javascript:void(0)></script>");
-         var script = document.getElementById("_ie_onload");
-         script.onreadystatechange = function() {
-         if(this.readyState == "complete") {
-         init();
-         }
-         };
-         /*@end @*/
-        return true;
-    }
-    window["iMoney"]["addLoadEvent"] = addLoadEvent;
-
-    //相关元素
-    function getRelatedTarget(event) {
-        if (event.relatedTarget) {
-            return event.relatedTarget;
-        } else if (event.toElement) {
-            return event.toElement;
-        } else if (event.fromElement) {
-            return event.fromElement;
-        } else {
-            return null;
-        }
-
-    }
-    window["iMoney"]["getRelatedTarget"] = getRelatedTarget;
-
-    //获取鼠标按键
-    function getButton(event) {
-        if (document.implementation.hasFeature("MouseEvents", "2.0")) {
-            return event.button;
-        } else {
-            switch (event.button) {
-                case 0:
-                case 1:
-                case 3:
-                case 5:
-                case 7:
-                    return 0;
-                case 2:
-                case 6:
-                    return 2;
-                case 4:
-                    return 1;
-            }
-        }
-    }
-    window["iMoney"]["getButton"] = getButton;
-
-    //键盘编码
-    function getCharCode(event) {
-        if (typeof event.charCode == "number") {
-            return event.charCode;
-        } else {
-            return event.keyCode;
-        }
-    }
-    window["iMoney"]["getCharCode"] = getCharCode;
-
-    //鼠标滚轮事件
-    function getWheelDelta(event) {
-        if (event.wheelDelta) {
-            return event.wheelDelta;
-        } else {
-            return -event.detail * 40;
-        }
-    }
-    window["iMoney"]["getRelatedTarget"] = getRelatedTarget;
-
-
-    //键盘命令
-    function getKeyPressed(event) {
-        event = event || getEvent(event);
-        var code = event.keyCode;
-        var value = String.fromCharCode(code);
-        return {
-            "code": code,
-            "value": value
-        };
-    }
-    window["iMoney"]["getKeyPressed"] = getKeyPressed;
-
-    //获取剪贴板内容
-    function getClipboardText(event) {
-        var clipboardData = (event.clipboardData || window.clipboardData);
-        return clipboardData.getData("text");
-    }
-    window["iMoney"]["getClipboardText"] = getClipboardText;
-
-    //设置剪贴板内容
-    function setClipboardText(event, value) {
-        if (event.clipboardData) {
-            event.clipboardData.setData("text/plain", value);
-        } else if (window.clipboardData) {
-            window.clipboardData.setData("text", value);
-        }
-    }
-    window["iMoney"]["setClipboardText"] = setClipboardText;
-
-    //序列化表单
-    function serialize(form) {
-        var parts = [],
-            field = null,
-            i,
-            len,
-            j,
-            optLen,
-            option,
-            optValue;
-
-        for (i = 0, len = form.elements.length; i < len; i++) {
-            field = form.elements[i];
-
-            switch (field.type) {
-                case "select-one":
-                case "select-multiple":
-
-                    if (field.name.length) {
-                        for (j = 0, optLen = field.options.length; j < optLen; j++) {
-                            option = field.options[j];
-                            if (option.selected) {
-                                optValue = "";
-                                if (option.hasAttribute) {
-                                    optValue = (option.hasAttribute("value") ? option.value : option.text);
+                //如果参数是HTML片段或者是#id字符
+                if (match && (match[1] || !context)) {
+                    if (match[1]) {
+                        context = context instanceof iMoney ? context[0] : context;
+                        //解析HTML片段为DOM对象，并返回包含这些DOM对象的iMoney集合
+                        iMoney.merge(this, iMoney.parseHTML(
+                            match[1],
+                            context && context.nodeType ? context.ownerDocument || context : document,
+                            true
+                        ));
+                        // $('<ul>',{className:'dropDown',click:function(){}});
+                        if (rsingleTag.test(match[1]) && iMoney.isPlainObject(context)) {
+                            for (match in context) {
+                                if (iMoney.isFunction(this[match])) {
+                                    this[match](context[match]);
                                 } else {
-                                    optValue = (option.attributes["value"].specified ? option.value : option.text);
+                                    this.attr(match, context[match]);
                                 }
-                                parts.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(optValue));
                             }
                         }
-                    }
-                    break;
+                        return this;
+                    } else {
+                        elem = document.getElementById(match[2]);
+                        if (elem && elem.parentNode) {
+                            this.length = 1;
+                            this[0] = elem;
+                        }
 
-                case undefined:     //字段级
-                case "file":        //文件输入
-                case "subiMoneyt":      //提交按钮
-                case "reset":       //重置按钮
-                case "button":      //自定义按钮
-                    break;
-
-                case "radio":       //单选按钮
-                case "checkbox":    //复选框
-                    if (!field.checked) {
-                        break;
+                        this.context = document;
+                        this.selector = selector;
+                        return this;
                     }
-                /* 执行默认操作 */
 
-                default:
-                    //不包含没有名字的表单字段
-                    if (field.name.length) {
-                        parts.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
+                //如果没有指定上下文，或上下文是iMoney对象
+                } else if (!context || context.imoney) {
+                    return (context || rootiMoney).find(selector);
+                } else {
+                    return iMoney(context).find(selector);
+                }
+            //DOM对象
+            } else if (selector.nodeType) {
+                this.context = this[0] = selector;
+                this.length = 1;
+                return this;
+            //selector是函数
+            } else if (iMoney.isFunction(selector)) {
+                return rootiMoney.ready(selector);
+            }
+
+            if (selector.selector !== undefined) {
+                this.selector = selector.selector;
+                this.context = selector.context;
+            }
+            return iMoney.makeArray(selector, this);
+        },
+        //初始化一个空选择器
+        selector: "",
+        //iMoney集合DOM对象为0
+        length: 0,
+        toArray: function() {
+            return core_slice.call(this);
+        },
+        //返回一个iMoney封装过的DOM结果集，prevObject会在调用end方法的时候用到
+        pushStack: function(elems) {
+            var ret = iMoney.merge(this.constructor(), elems);
+            ret.prevObject = this;
+            ret.context = this.context;
+            return ret;
+        },
+        each: function(callback, args) {
+            return iMoney.each(this, callback, args);
+        },
+        filter: function(selector) {
+            if (iMoney.isFunction(selector)) return this.not(this.not(selector))
+            return $(core_filter.call(this, function(element) {
+                return iMoney.matches(element, selector)
+            }))
+        },
+        slice: function() {
+            return this.pushStack(core_slice.apply(this, arguments));
+        },
+        map: function(callback) {
+            return this.pushStack(iMoney.map(this, function(elem, i) {
+                return callback.call(elem, i, elem);
+            }));
+        },
+        end: function() {
+            return this.prevObject || this.constructor(null);
+        },
+        forEach: emptyArray.forEach,
+        reduce: emptyArray.reduce,
+        push: emptyArray.push,
+        sort: emptyArray.sort,
+        splice: emptyArray.splice,
+        indexOf: emptyArray.indexOf,
+    }
+    iMoney.fn.init.prototype = iMoney.fn;
+    //合并n个对象的属性到第一个对象中，扩展iMoney元素集合来提供新的方法/扩展jQuery对象本身
+    iMoney.extend = iMoney.fn.extend = function() {
+        var options, name, src, copy, copyIsArray, clone,
+            target = arguments[0] || {},
+            i = 1,
+            length = arguments.length,
+            deep = false;
+
+        //深层拷贝
+        if (typeof target === "boolean") {
+            deep = target;
+            target = arguments[1] || {};
+            //跳过boolean和target
+            i = 2;
+        }
+
+        //如果target不是对象，不是函数，比如是字符串
+        if (typeof target !== "object" && !iMoney.isFunction(target)) {
+            target = {};
+        }
+
+        //如果只有一个参数
+        if (length === i) {
+            target = this;
+            --i;
+        }
+
+        for (; i < length; i++) {
+            //只处理non-null/undefined值
+            if ((options = arguments[i]) != null) {
+                // Extend the base object
+                for (name in options) {
+                    src = target[name];
+                    copy = options[name];
+
+                    //跳过循环
+                    if (target === copy) {
+                        continue;
                     }
+                    //如果深层合并对象或数组需要递归
+                    if (deep && copy && (iMoney.isPlainObject(copy) || (copyIsArray = iMoney.isArray(copy)))) {
+                        if (copyIsArray) {
+                            copyIsArray = false;
+                            clone = src && iMoney.isArray(src) ? src : [];
+
+                        } else {
+                            clone = src && iMoney.isPlainObject(src) ? src : {};
+                        }
+
+                        //复制而不移动原始对象
+                        target[name] = iMoney.extend(deep, clone, copy);
+
+                        //过滤undefined值
+                    } else if (copy !== undefined) {
+                        target[name] = copy;
+                    }
+                }
             }
         }
-        return parts.join("&");
-    }
-    window["iMoney"]["serialize"] = serialize;
-
-    //解析XML
-    function parseXml(xml) {
-        var xmldom = null;
-
-        if (typeof DOMParser != "undefined") {
-            xmldom = (new DOMParser()).parseFromString(xml, "text/xml");
-            var errors = xmldom.getElementsByTagName("parsererror");
-            if (errors.length) {
-                throw new Error("XML 解析错误:" + errors[0].textContent);
+        //返回修改的对象
+        return target;
+    };
+    //选择符合条件的元素 find 此处有问题需要仔细研究
+    iMoney.fn.extend({
+        not: function(selector) {
+            var nodes = []
+            if (iMoney.isFunction(selector) && selector.call !== undefined)
+                this.each(function(idx) {
+                    if (!selector.call(this, idx)) nodes.push(this)
+                })
+            else {
+                var excludes = typeof selector == 'string' ? this.filter(selector) :
+                    (likeArray(selector) && iMoney.isFunction(selector.item)) ? core_slice.call(selector) : $(selector)
+                this.forEach(function(el) {
+                    if (excludes.indexOf(el) < 0) nodes.push(el)
+                })
             }
-        } else if (typeof ActiveXObject != "undefined") {
+            return $(nodes)
+        },
+        first: function() {
+            return this.eq(0);
+        },
+        last: function() {
+            return this.eq(-1);
+        },
+        eq: function(i) {
+            var len = this.length,
+                j = +i + (i < 0 ? len : 0);
+            return this.pushStack(j >= 0 && j < len ? [this[j]] : []);
+        },
+        //iMoney.find(selector, self[i], ret)
+        find: function(selector) {
+            var result = [] ;
+            if (!selector) result = iMoney()
+            if (this.length==1){
+                result = this.pushStack(this[0].querySelectorAll(selector));
+            } else if (this.length>1){
+                result = this.map(function(){
+                    return core_slice.call(this.querySelectorAll(selector))
+                })
+            }
+            result.selector = this.selector ? this.selector + " " + selector : selector;
+            console.log(result)
+            return result;
+        }
+    });
+    iMoney.fn.init.prototype = iMoney.fn;
+    //iMoney方法
+    iMoney.extend({
+        noConflict: function(deep) {
+            //交出$的控制权
+            if (window.$ === iMoney) {
+                window.$ = _$;
+            }
+            //交出iMoney的控制权
+            if (deep && window.iMoney === iMoney) {
+                window.iMoney = _iMoney;
+            }
+            return iMoney;
+        },
+        ready:function(callback) {
+            if (/complete|loaded|interactive/.test(document.readyState) && document.body) {
+                callback($);
+            } else {
+                document.addEventListener('DOMContentLoaded', function() {
+                    callback($);
+                }, false)
+            }
+            return this
+        },
+        isFunction: function(obj) {
+            return iMoney.type(obj) === "function";
+        },
+        isArray: Array.isArray || function(obj) {
+            return iMoney.type(obj) === "array";
+        },
+        isWindow: function(obj) {
+            return obj != null && obj == obj.window;
+        },
+        isDocument: function(obj) {
+            return obj != null && obj.nodeType == obj.DOCUMENT_NODE
+        },
+        isNumeric: function(obj) {
+            return !isNaN(parseFloat(obj)) && isFinite(obj);
+        },
+        type: function(obj) {
+            if (obj == null) {
+                return String(obj);
+            }
+            return typeof obj === "object" || typeof obj === "function" ?
+                class2type[core_toString.call(obj)] || "object" :
+                typeof obj;
+        },
+        //判断对象否为纯粹的对象字面量，对于通过字面量定义的对象和new Object的对象返回true，new Object时传参数的返回false
+        isPlainObject: function(obj) {
+            //首先检查是否是一个对象
+            if (!obj || iMoney.type(obj) !== "object" || obj.nodeType || iMoney.isWindow(obj)) {
+                return false;
+            }
+            try {
+                //如果对象具有构造函数，但却不是自身的属性，说明这个构造函数是通过prototye继承来的
+                if (obj.constructor && !core_hasOwn.call(obj, "constructor") && !core_hasOwn.call(obj.constructor.prototype, "isPrototypeOf")) {
+                    return false;
+                }
+            } catch (e) {
+                // IE8,9 将抛出异常
+                return false;
+            }
 
-            //创建XML文档实例
-            function createDocument() {
-                if (typeof arguments.callee.activeXString != "string") {
-                    var versions = ["MSXML2.DOMDocument.6.0", "MSXML2.DOMDocument.3.0",
-                        "MSXML2.DOMDocument"];
+            //用于检查对象的属性是否都是自身的，因为遍历对象属性时，会先从自身的属性开始遍历，所以只需要检查最后的属性是否是自身的就可以了
 
-                    for (var i = 0, len = versions.length; i < len; i++) {
-                        try {
-                            var xmldom = new ActiveXObject(versions[i]);
-                            arguments.callee.activeXString = versions[i];
-                            return xmldom;
-                        } catch (ex) {
-                            //skip
+            var key;
+            for (key in obj) {}
+
+            return key === undefined || core_hasOwn.call(obj, key);
+        },
+        //是否空对象
+        isEmptyObject: function(obj) {
+            var name;
+            for (name in obj) {
+                return false;
+            }
+            return true;
+        },
+        error: function(msg) {
+            throw new Error(msg);
+        },
+        //把字符串解析成DOM
+        parseHTML: function(data, context, keepScripts) {
+            if (!data || typeof data !== "string") {
+                return null;
+            }
+            if (typeof context === "boolean") {
+                keepScripts = context;
+                context = false;
+            }
+            context = context || document;
+            //Single tag
+            //rsingleTag = /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
+            //匹配HTML标签
+            var parsed = rsingleTag.exec(data),
+                scripts = !keepScripts && [];
+            // Single tag
+            if (parsed) {
+                return [context.createElement(parsed[1])];
+            }
+            parsed = iMoney.buildFragment([data], context, scripts);
+            if (scripts) {
+                iMoney(scripts).remove();
+            }
+            return iMoney.merge([], parsed.childNodes);
+        },
+        //一个空对象
+        noop: function() {},
+        //执行一些JavaScript全局对象
+        globalEval: function(data) {
+            if (data && core_rnotwhite.test(data)) {
+                // We use execScript on Internet Explorer
+                // We use an anonymous function so that context is window
+                (window.execScript || function(data) {
+                    window["eval"].call(window, data);
+                })(data);
+            }
+        },
+        //转化驼峰的字符串
+        camelCase: function(string) {
+            return string.replace(/^-ms-/, "ms-").replace(/-([\da-z])/gi, function(all, letter) {
+                return (letter + "").toUpperCase();
+            });
+        },
+        //节点名称
+        nodeName: function(elem, name) {
+            return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
+        },
+        //遍历对象或数组
+        each: function(obj, callback, args) {
+            var name,
+                i = 0,
+                length = obj.length,
+                isObj = length === undefined || iMoney.isFunction(obj);
+
+            if (args) {
+                if (isObj) {
+                    for (name in obj) {
+                        if (callback.apply(obj[name], args) === false) {
+                            break;
+                        }
+                    }
+                } else {
+                    for (; i < length;) {
+                        if (callback.apply(obj[i++], args) === false) {
+                            break;
                         }
                     }
                 }
 
-                return new ActiveXObject(arguments.callee.activeXString);
-            }
-
-            xmldom = createDocument();
-            xmldom.loadXML(xml);
-            if (xmldom.parseError != 0) {
-                throw new Error("XML 解析错误: " + xmldom.parseError.reason);
-            }
-        } else {
-            throw new Error("不支持XML 解析！");
-        }
-
-        return xmldom;
-    }
-    window["iMoney"]["parseXml"] = parseXml;
-
-    //XPath用来在DOM文档中查找节点
-    //XPath，找到匹配的节点时返回第一个
-    function selectSingleNode(context, expression, namespaces) {
-        var doc = (context.nodeType != 9 ? context.ownerDocument : context);
-
-        if (typeof doc.evaluate != "undefined") {
-            var nsresolver = null;
-            if (namespaces instanceof Object) {
-                nsresolver = function (prefix) {
-                    return namespaces[prefix];
-                };
-            }
-
-            var result = doc.evaluate(expression, context, nsresolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-            return (result !== null ? result.singleNodeValue : null);
-
-        } else if (typeof context.selectSingleNode != "undefined") {
-
-            //创建命名空间字符串
-            if (namespaces instanceof Object) {
-                var ns = "";
-                for (var prefix in namespaces) {
-                    if (namespaces.hasOwnProperty(prefix)) {
-                        ns += "xmlns:" + prefix + "='" + namespaces[prefix] + "' ";
+            } else {
+                if (isObj) {
+                    for (name in obj) {
+                        if (callback.call(obj[name], name, obj[name]) === false) {
+                            break;
+                        }
                     }
-                }
-                doc.setProperty("SelectionNamespaces", ns);
-            }
-            return context.selectSingleNode(expression);
-        } else {
-            throw new Error("No XPath engine found.");
-        }
-    }
-    window["iMoney"]["selectSingleNode"] = selectSingleNode;
-
-    //XPath，返回与模式匹配的所有节点
-    function selectNodes(context, expression, namespaces) {
-        var doc = (context.nodeType != 9 ? context.ownerDocument : context);
-
-        if (typeof doc.evaluate != "undefined") {
-            var nsresolver = null;
-            if (namespaces instanceof Object) {
-                nsresolver = function (prefix) {
-                    return namespaces[prefix];
-                };
-            }
-
-            var result = doc.evaluate(expression, context, nsresolver, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-            var nodes = new Array();
-
-            if (result !== null) {
-                for (var i = 0, len = result.snapshotLength; i < len; i++) {
-                    nodes.push(result.snapshotItem(i));
-                }
-            }
-
-            return nodes;
-        } else if (typeof context.selectNodes != "undefined") {
-
-            //创建命名空间字符串
-            if (namespaces instanceof Object) {
-                var ns = "";
-                for (var prefix in namespaces) {
-                    if (namespaces.hasOwnProperty(prefix)) {
-                        ns += "xmlns:" + prefix + "='" + namespaces[prefix] + "' ";
-                    }
-                }
-                doc.setProperty("SelectionNamespaces", ns);
-            }
-            var result = context.selectNodes(expression);
-            var nodes = new Array();
-
-            for (var i = 0, len = result.length; i < len; i++) {
-                nodes.push(result[i]);
-            }
-
-            return nodes;
-        } else {
-            throw new Error("No XPath engine found.");
-        }
-    }
-    window["iMoney"]["selectNodes"] = selectNodes;
-
-    //序列化XML
-    function serializeXml(xmldom) {
-
-        if (typeof XMLSerializer != "undefined") {
-            return (new XMLSerializer()).serializeToString(xmldom);
-        } else if (typeof xmldom.xml != "undefined") {
-            return xmldom.xml;
-        } else {
-            throw new Error("Could not serialize XML DOM.");
-        }
-    }
-    window["iMoney"]["serializeXml"] = serializeXml;
-
-    //XSLT文档形式转换
-    function transform(context, xslt) {
-        if (typeof XSLTProcessor != "undefined") {
-            var processor = new XSLTProcessor();
-            processor.importStylesheet(xslt);
-
-            var result = processor.transformToDocument(context);
-            return (new XMLSerializer()).serializeToString(result);
-
-        } else if (typeof context.transformNode != "undefined") {
-            return context.transformNode(xslt);
-        } else {
-            throw new Error("No XSLT processor available.");
-        }
-    }
-    window["iMoney"]["transform"] = transform;
-
-    //创建XHR
-    function createXHR() {
-        if (typeof XMLHttpRequest != "undefined") {
-            return new XMLHttpRequest();
-        } else if (typeof ActiveXObject != "undefined") {
-            if (typeof arguments.callee.activeXString != "string") {
-                var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0",
-                        "MSXML2.XMLHttp"],
-                    i, len;
-
-                for (i = 0, len = versions.length; i < len; i++) {
-                    try {
-                        new ActiveXObject(versions[i]);
-                        arguments.callee.activeXString = versions[i];
-                        break;
-                    } catch (ex) {
-                        //跳过
+                } else {
+                    for (; i < length;) {
+                        if (callback.call(obj[i], i, obj[i++]) === false) {
+                            break;
+                        }
                     }
                 }
             }
 
-            return new ActiveXObject(arguments.callee.activeXString);
-        } else {
-            throw new Error("No XHR object available.");
-        }
-    }
-    window["iMoney"]["createXHR"] = createXHR;
+            return obj;
+        },
+        //去空格
+        trim: function(text) {
+            return text == null ? "" : core_trim.call(text);
+        },
+        //合并或推入数组
+        makeArray: function(arr, results) {
+            var type,
+                ret = results || [];
+            if (arr != null) {
+                type = iMoney.type(arr);
+                if (arr.length == null || type === "string" || type === "function" || type === "regexp" || iMoney.isWindow(arr)) {
+                    Array.prototype.push.call(ret, arr);
+                } else {
+                    iMoney.merge(ret, arr);
+                }
+            }
 
-    //解析JSON
-    function parseJSON(s, filter) {
-        var j;
+            return ret;
+        },
+        inArray: function(elem, arr, i) {
+            var len;
 
-        function walk(k, v) {
-            var i;
-            if (v && typeof v === 'object') {
-                for (i in v) {
-                    if (v.hasOwnProperty(i)) {
-                        v[i] = walk(i, v[i]);
+            if (arr) {
+                if (core_indexOf) {
+                    return core_indexOf.call(arr, elem, i);
+                }
+
+                len = arr.length;
+                i = i ? i < 0 ? Math.max(0, len + i) : i : 0;
+
+                for (; i < len; i++) {
+                    // Skip accessing in sparse arrays
+                    if (i in arr && arr[i] === elem) {
+                        return i;
                     }
                 }
             }
-            return filter(k, v);
-        }
 
-        //通过正则表达式检测JSON文本，查找非JSON字符。其中，特别关注"()
-        //"和"new"，因为它们会引起语句的调用，还有“=”，因为它会导致变量的值发生改变
-        //不过，为安全起见这里会拒绝所有不希望出现的字符
-        if (/^("(\\.|[^"\\\n\r])*?"|[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t])+?$/.test(s)) {
-
-            try {
-                j = eval('(' + s + ')');
-            } catch (e) {
-                throw new SyntaxError("parseJSON");
-            }
-        } else {
-            throw new SyntaxError("parseJSON");
-        }
-
-        if (typeof filter === 'function') {
-            j = walk('', j);
-        }
-        return j;
-    }
-
-    //CORS跨资源共享
-    function createCORSRequest(method, url) {
-        var xhr = new XMLHttpRequest();
-        if ("withCredentials" in xhr) {
-            xhr.open(method, url, true);
-        } else if (typeof XDomainRequest != "undefined") {
-            xhr = new XDomainRequest();
-            xhr.open(method, url);
-        } else {
-            xhr = null;
-        }
-        return xhr;
-    }
-    window["iMoney"]["createCORSRequest"] = createCORSRequest;
-
-    //获取cookie
-    function getCookie(name) {
-        var cookieName = encodeURIComponent(name) + "=",
-            cookieStart = document.cookie.indexOf(cookieName),
-            cookieValue = null,
-            cookieEnd;
-
-        if (cookieStart > -1) {
-            cookieEnd = document.cookie.indexOf(";", cookieStart);
-            if (cookieEnd == -1) {
-                cookieEnd = document.cookie.length;
-            }
-            cookieValue = decodeURIComponent(document.cookie.substring(cookieStart + cookieName.length, cookieEnd));
-        }
-
-        return cookieValue;
-    }
-    window["iMoney"]["getCookie"] = getCookie;
-
-    //设置cookie
-    function setCookie(name, value, expires, path, domain, secure) {
-        var cookieText = encodeURIComponent(name) + "=" + encodeURIComponent(value);
-
-        if (expires instanceof Date) {
-            cookieText += "; expires=" + expires.toGMTString();
-        }
-
-        if (path) {
-            cookieText += "; path=" + path;
-        }
-
-        if (domain) {
-            cookieText += "; domain=" + domain;
-        }
-
-        if (secure) {
-            cookieText += "; secure";
-        }
-
-        document.cookie = cookieText;
-    }
-    window["iMoney"]["setCookie"] = setCookie;
-
-    //删除cookie
-    function unsetCookie(name, path, domain, secure) {
-        this.set(name, "", new Date(0), path, domain, secure);
-    }
-    window["iMoney"]["unsetCookie"] = unsetCookie;
-
-    //获取单个子cookie
-    function getSubCookie(name, subName) {
-        var subCookies = this.getAll(name);
-        if (subCookies) {
-            return subCookies[subName];
-        } else {
-            return null;
-        }
-    }
-    window["iMoney"]["getSubCookie"] = getSubCookie;
-
-    //获取所有子cookie
-    function getAllSubCookie(name) {
-        var cookieName = encodeURIComponent(name) + "=",
-            cookieStart = document.cookie.indexOf(cookieName),
-            cookieValue = null,
-            cookieEnd, subCookies, i, parts, result = {};
-
-        if (cookieStart > -1) {
-            cookieEnd = document.cookie.indexOf(";", cookieStart)
-            if (cookieEnd == -1) {
-                cookieEnd = document.cookie.length;
-            }
-            cookieValue = document.cookie.substring(cookieStart + cookieName.length, cookieEnd);
-
-            if (cookieValue.length > 0) {
-                subCookies = cookieValue.split("&");
-
-                for (i = 0, len = subCookies.length; i < len; i++) {
-                    parts = subCookies[i].split("=");
-                    result[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
+            return -1;
+        },
+        //合并第二个数组到第一个数组中，不覆盖
+        merge: function(first, second) {
+            var l = second.length,
+                i = first.length,
+                j = 0;
+            if (typeof l === "number") {
+                for (; j < l; j++) {
+                    first[i++] = second[j];
                 }
-
-                return result;
+            } else {
+                while (second[j] !== undefined) {
+                    first[i++] = second[j++];
+                }
             }
+
+            first.length = i;
+            return first;
+        },
+        //从数组里过滤满足条件的元素
+        grep: function(elems, callback, inv) {
+            var retVal,
+                ret = [],
+                i = 0,
+                length = elems.length;
+            inv = !! inv;
+            //保存数组中通过callback验证的元素
+            for (; i < length; i++) {
+                retVal = !! callback(elems[i], i);
+                if (inv !== retVal) {
+                    ret.push(elems[i]);
+                }
+            }
+            return ret;
+        },
+
+        //操作数组或对象里的所有元素
+        map: function(elems, callback, arg) {
+            var value, key,
+                ret = [],
+                i = 0,
+                length = elems.length,
+                isArray = elems instanceof iMoney || length !== undefined && typeof length === "number" && ((length > 0 && elems[0] && elems[length - 1]) || length === 0 || iMoney.isArray(elems));
+            if (isArray) {
+                for (; i < length; i++) {
+                    value = callback(elems[i], i, arg);
+
+                    if (value != null) {
+                        ret[ret.length] = value;
+                    }
+                }
+            } else {
+                for (key in elems) {
+                    value = callback(elems[key], key, arg);
+
+                    if (value != null) {
+                        ret[ret.length] = value;
+                    }
+                }
+            }
+            return ret.concat.apply([], ret);
+        },
+        now: function() {
+            return (new Date()).getTime();
         }
+    });
+    //contains、fragment 
+    iMoney.extend({
+        //文档片段
+        buildFragment: function(elems, context, scripts, selection) {
+            var rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
+                rtagName = /<([\w:]+)/,
+                rhtml = /<|&#?\w+;/;
+            var wrapMap = {
+                option: [1, "<select multiple='multiple'>", "</select>"],
+                thead: [1, "<table>", "</table>"],
+                col: [2, "<table><colgroup>", "</colgroup></table>"],
+                tr: [2, "<table><tbody>", "</tbody></table>"],
+                td: [3, "<table><tbody><tr>", "</tr></tbody></table>"],
+                _default: [0, "", ""]
+            };
+            wrapMap.optgroup = wrapMap.option;
+            wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
+            wrapMap.th = wrapMap.td;
+            var elem, tmp, tag, wrap, contains, j,
+                i = 0,
+                l = elems.length,
+                fragment = context.createDocumentFragment(),
+                nodes = [];
+            for (; i < l; i++) {
+                elem = elems[i];
 
-        return null;
-    }
-    window["iMoney"]["getAllSubCookie"] = getAllSubCookie;
+                if (elem || elem === 0) {
+                    if (iMoney.type(elem) === "object") {
+                        iMoney.merge(nodes, elem.nodeType ? [elem] : elem);
+                    } else if (!rhtml.test(elem)) {
+                        nodes.push(context.createTextNode(elem));
+                    } else {
 
-    //设置单个子cookie
-    function setSubCookie(name, subName, value, expires, path, domain, secure) {
-
-        var subcookies = this.getAll(name) || {};
-        subcookies[subName] = value;
-        this.setAll(name, subcookies, expires, path, domain, secure);
-
-    }
-    window["iMoney"]["setSubCookie"] = setSubCookie;
-
-    //设置所有子cookie
-    function setAllSubCookie(name, subcookies, expires, path, domain, secure) {
-
-        var cookieText = encodeURIComponent(name) + "=",
-            subcookieParts = new Array(),
-            subName;
-
-        for (subName in subcookies) {
-            if (subName.length > 0 && subcookies.hasOwnProperty(subName)) {
-                subcookieParts.push(encodeURIComponent(subName) + "=" + encodeURIComponent(subcookies[subName]));
+                        tmp = tmp || fragment.appendChild(context.createElement("div"));
+                        //$('<option value="1">1</option>')
+                        tag = (rtagName.exec(elem) || ["", ""])[1].toLowerCase();
+                        wrap = wrapMap[tag] || wrapMap._default;
+                        tmp.innerHTML = wrap[1] + elem.replace(rxhtmlTag, "<$1></$2>") + wrap[2];
+                        j = wrap[0];
+                        while (j--) {
+                            tmp = tmp.lastChild;
+                        }
+                        iMoney.merge(nodes, tmp.childNodes);
+                        tmp = fragment.firstChild;
+                        tmp.textContent = "";
+                    }
+                }
             }
+            fragment.textContent = "";
+            i = 0;
+            while ((elem = nodes[i++])) {
+                if (selection && iMoney.inArray(elem, selection) !== -1) {
+                    continue;
+                }
+                fragment.appendChild(elem)
+            }   
+            return fragment;
         }
-
-        if (subcookieParts.length > 0) {
-            cookieText += subcookieParts.join("&");
-
-            if (expires instanceof Date) {
-                cookieText += "; expires=" + expires.toGMTString();
-            }
-
-            if (path) {
-                cookieText += "; path=" + path;
-            }
-
-            if (domain) {
-                cookieText += "; domain=" + domain;
-            }
-
-            if (secure) {
-                cookieText += "; secure";
-            }
-        } else {
-            cookieText += "; expires=" + (new Date(0)).toGMTString();
-        }
-
-        document.cookie = cookieText;
-
+    });
+    //定义iMoney和$标识符
+    if (typeof window === "object" && typeof window.document === "object") {
+        window.iMoney = window.$ = iMoney;
     }
-    window["iMoney"]["setAllSubCookie"] = setAllSubCookie;
-
-    //删除单个子cookie
-    function unsetSubCookie(name, subName, path, domain, secure) {
-        var subcookies = this.getAll(name);
-        if (subcookies) {
-            delete subcookies[subName];
-            this.setAll(name, subcookies, null, path, domain, secure);
-        }
-    }
-    window["iMoney"]["unsetSubCookie"] = unsetSubCookie;
-
-    //删除所有子cookie
-    function unsetAllSubCookie(name, path, domain, secure) {
-        this.setAll(name, null, new Date(0), path, domain, secure);
-    }
-    window["iMoney"]["unsetAllSubCookie"] = unsetAllSubCookie;
-
-
-    //在控制台显示错误日志
-    function log(message) {
-        var console = document.getElementById("debuginfo");
-        if (console === null) {
-            console = document.createElement("div");
-            console.id = "debuginfo";
-            console.style.background = "#dedede";
-            console.style.border = "1px solid silver";
-            console.style.padding = "5px";
-            console.style.width = "400px";
-            console.style.position = "absolute";
-            console.style.right = "0px";
-            console.style.top = "0px";
-            document.body.appendChild(console);
-        }
-        console.innerHTML += "<p>" + message + "</p>";
-    }
-    window["iMoney"]["log"] = log;
-})();
+})(window);
