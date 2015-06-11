@@ -2,8 +2,8 @@
     "name": "iMoney.js",
     "version": "v1.1.0",
     "description": "JavaScript iMoney库",
-    "author": "坦克",
-    "url": "http://www.w3cmm.com/",
+    "author": "Thunk",
+    "url": "http://imoney.w3cmm.com/",
     "devDependencies": {
         "grunt": "~0.4.1",
         "grunt-contrib-uglify": "~0.2.2"

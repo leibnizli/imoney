@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>iMoney.js demo</title>
+    <title>iMoney demo</title>
     <style>
     html,
     body {
@@ -14,23 +14,49 @@
 </head>
 
 <body>
-    <!-- <div class="" style="height:1000px;"></div> -->
-    <div>
-        <form action="">
-            <ul id="main" style="_background:#bbb">
-                <li class="box">1</li>
-                <li>2</li>
-                <li>3</li>
-                <li>4</li>
-            </ul>
-        </form>
+    <!-- b -->
+    <span></span>
+    <div id="main">
+        <ul class="test">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+        </ul>
     </div>
-
-    <script src="lib/iMoney.js"></script>
+    <ul class="main">
+        <li class="test">1</li>
+        <li class="test">2</li>
+        <li>3</li>
+    </ul>    <div class="main">
+        <ul class="test">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+        </ul>
+    </div>
+    <div id="test"></div>
+    <script src="lib/imoney.js"></script>
     <script>
-    //console.log($("#main").selector);
+    //console.log($("ul").hasClass("test"))
+    //var span = document.createElement("span");
+    //$(".main").find(".test")
+    //$($(".test"))
+    //console.log($("<b>"))
+    //var match =/^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/;
+    //consle.log(match.exec("<b>123</b>")[1])
+    //consle.log(match.exec("#ww")[2])
+    //console.log($("li"))
+    //console.log($([]))
+    //console.log(document.querySelectorAll("#main"))
+
+    // $.config({
+    //     baseUrl:http://www.baidu.com/
+    // })
+    var obj = function(){};
+    $.require(["mod"],function(mod){
+        console.log(mod.color)
+    })
     </script>
-    由于getNameFunc()返回一个函数，因此调用object.getNameFunc()()就会立即调用它返回的函数，结果就是返回一个字符串。
 </body>
 
 </html>

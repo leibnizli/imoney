@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <title>test</title>
+    <style>
+    html, body {
+        min-height:100%;
+    }
+    #main { width:100px; height:100px; background:red; color:#fff; }
+    </style>
+</head>
+
+<body>
+    <div id="wrap">
+        <div id="main" style="width:100px">
+            <b>test</b>
+            <span class="three"></span>
+        </div>
+    </div>
+    <div id="test" style="width:100px"><b>test</b></div>
+    <div id="newElement"></div>
+    <div id="parentElement">
+      <span id="childElement">foo bar</span>
+    </div>
+    <div id="inputdiv">
+        <input type="text" id="input">11111111
+    </div>
+    <script type="text/javascript"> 
+    // document.getElementById("inputdiv").addEventListener("focusin",function(){console.log("inputdiv")},true)
+    // document.getElementById("input").addEventListener("focusin",function(event){console.log("input")},true)
+
+    // document.body.addEventListener("click",function(event){
+    //     console.log(event);
+    //     console.log(!event.isDefaultPrevented)
+    // },true)
+    function test(){}
+    console.log(test)
+    // document.getElementById("wrap").addEventListener("click",function(){console.log("wrap")},true)
+    // document.getElementById("main").addEventListener("click",function(){
+    //     console.log("main");
+    // },true)
+
+    </script>
+</body>
+
+</html>
