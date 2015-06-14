@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>iMoney demo</title>
+    <script src="../src/imoney.js"></script>
+</head>
+
+<body>
+    <ul>
+        <li></li>
+        <li class="test"></li>
+        <li></li>
+    </ul>
+    <div id="result" test="123"></div>
+    <script>
+    //var $li = $("li");
+    // console.log($li);
+    // [].some.call($li,function(el){
+    //     console.log(this)
+    //     console.log(el)
+    // })
+    var $result = $("#result");
+    // var test = $result.attr("test");
+    // console.log(test);
+    // $result.removeAttr("test")
+    //function test(){
+    //    console.log(arguments)
+    //}
+    //test("a","b")
+    $result.data("name","张三");
+    //$result.data("name");
+    </script>
+</body>
+
+</html>

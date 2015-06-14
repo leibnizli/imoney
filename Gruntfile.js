@@ -5,7 +5,7 @@ module.exports = function(grunt) {
         //读取package.json的内容，形成个json数据
         pkg: grunt.file.readJSON('package.json'),
         dirs: {
-            src: 'src/lib',
+            src: 'src',
             //dest: 'dist/<%= pkg.name %>/<%= pkg.version %>',
             dest: 'build',
         },

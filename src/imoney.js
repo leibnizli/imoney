@@ -7,9 +7,10 @@
 (function(window, undefined) {
     var rootiMoney,
         _$ = window.$,
+        classCache = {},
         class2type = {},
-        core_version = "1.1.0",
         emptyArray = [],
+        core_version = "1.1.0",
         core_filter = emptyArray.filter,
         core_concat = emptyArray.concat,
         core_push = emptyArray.push,
@@ -28,6 +29,10 @@
         //用来排除空白字符
         core_rnotwhite = /\S+/g,
         rquickExpr = /#([\w-]*)$/;
+    function classRE(name) {
+        return name in classCache ?
+            classCache[name] : (classCache[name] = new RegExp('(^|\\s)' + name + '(\\s|$)'))
+    }
     var iMoney = function(selector, context) {
         return new iMoney.fn.init(selector, context, rootiMoney);
     };
@@ -53,7 +58,6 @@
                     return this;
                 //如果没有指定上下文，或上下文是iMoney对象
                 } else if (!context || context.imoney) {
-                    debugger
                     return (context || rootiMoney).find(selector);
                 } else {
                     return iMoney(context).find(selector);
@@ -173,7 +177,7 @@
         //返回修改的对象
         return target;
     };
-    //选择符合条件的元素
+    //扩展iMoney原型方法
     iMoney.fn.extend({
         //iMoney.find(selector, self[i], ret)
         find: function(selector) {
@@ -187,12 +191,74 @@
                 })
             }
             result.selector = this.selector ? this.selector + " " + selector : selector;
-            console.log(result)
             return result;
+        },
+        hasClass: function(name) {
+            if (!name) return false
+            return emptyArray.some.call(this, function(el) {
+                return this.test(el.className)
+            }, classRE(name))
+        },
+        attr: function(name, value) {
+            var isFunc = typeof value == "function"
+            if (typeof value == "string" || typeof value == "number" || isFunc) {
+                return this.each(function(i) {
+                    if (this.nodeType > 1) return
+                    this.setAttribute(
+                        name, isFunc ? value.call(this, i, this.getAttribute(name)) : value
+                    )
+                })
+            }
+            if (typeof name == "object") {
+                return this.each(function(){
+                    for (key in name) this.setAttribute(key,name[key])
+                })
+            }
+            var el = this.get(0)
+            if (!el || el.nodeType > 1) return
+            var attrValue = el.getAttribute(name)
+            if (attrValue == null) {
+                return undefined
+            }
+            if (!attrValue) {
+                return name
+            }
+            return attrValue
+        },
+        removeAttr: function(name) {
+            return this.each(function() {
+                this.nodeType === 1 && name.split(' ').forEach(function(attribute) {
+                    this.removeAttribute(attribute);
+                }, this)
+            })
+        },
+        data: function(name, value) {
+            var attrName = 'data-' + name.replace(/([A-Z])/g, '-$1').toLowerCase()
+            var data = (1 in arguments) ?
+                this.attr(attrName, value) :
+                this.attr(attrName);
+            console.log(data)
+            return data !== null ? data : undefined
+        },
+        //data
+        //code here
+        html: function(htmlString) {
+            if (htmlString == null) {
+                var el = this.get(0)
+                if (!el) return
+                return el.innerHTML
+            }
+            return this.each(function() {
+                this.innerHTML = htmlString
+            })
+        },
+        empty: function() {
+            return this.each(function() {
+                this.innerHTML = ''
+            })
         }
     });
-    iMoney.fn.init.prototype = iMoney.fn;
-    //iMoney方法
+    //扩展iMoney方法
     iMoney.extend({
         noConflict: function(deep) {
             if (window.$ === iMoney) {
@@ -385,7 +451,6 @@
             }
             return ret;
         },
-
         //操作数组或对象里的所有元素
         map: function(elems, callback, arg) {
             var value, key,
@@ -416,6 +481,13 @@
         hasProp: function(obj, prop){
             return core_hasOwn.call(obj, prop);
         },
+        getOwn: function(obj, prop){
+            return iMoney.hasProp(obj, prop) && obj[prop];
+        },
+        nextTick: function(fn) {
+            setTimeout(fn, 4);
+        },
+        parseJSON: JSON.parse,
         now: function() {
             return (new Date()).getTime();
         }
@@ -423,18 +495,14 @@
     iMoney.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
         class2type["[object " + name + "]"] = name.toLowerCase();
     });
-    //加载器
+    rootiMoney = iMoney(document);
     (function (global) {
         var require, define,baseElement,currentlyAddingScript,
         globalDefQueue = [],
         contexts={},
         defined = {},
         defContextName = '_',
-        head = document.getElementsByTagName('head')[0],
-        baseElement = document.getElementsByTagName('base')[0];
-        if (baseElement) {
-            head = baseElement.parentNode;
-        }
+        head = document.getElementsByTagName('head')[0];
         //循环数组，func返回true中断
         function each(ary, func) {
             if (ary) {
@@ -452,22 +520,26 @@
                 return fn.apply(obj, arguments);
             };
         }
-        function getOwn(obj, prop) {
-            return iMoney.hasProp(obj, prop) && obj[prop];
+        function scripts () {
+            return document.getElementsByTagName('script');
         }
-        function nextTick(fn) {
-            setTimeout(fn, 4);
+        function eachProp(obj, func) {
+            var prop;
+            for (prop in obj) {
+                if (iMoney.hasProp(obj, prop)) {
+                    if (func(obj[prop], prop)) {
+                        break;
+                    }
+                }
+            }
         }
-        function newContext(){
-            var inCheckLoaded,context,Module,handlers,
+        function newContext(contextName){
+            var inCheckLoaded,context,Module,handlers,checkLoadedTimeoutId,
                 enabledRegistry = {},
                 config = {
                     waitSeconds: 7,
                     baseUrl: './',
-                    paths: {},
-                    bundles: {},
-                    shim: {},
-                    config: {}
+                    paths: {}
                 },
                 registry = {},
                 defQueue = [],
@@ -475,21 +547,22 @@
                 undefEvents = {},
                 requireCounter=1;
             function makeModuleMap(name, parentModuleMap, isNormalized, applyMap){
-                var originalName = name;
+                var originalName = name,isDefine = true;
                 if (!name) {
                     isDefine = false;
                     name = '_@' + (requireCounter += 1);
                 }
                 return {
                     originalName:originalName,
+                    isDefine: isDefine,
                     map:name,
                     id:name,
-                    url:name+'.js'
+                    url:context.nameToUrl(name)
                 };
             }
             function getModule(depMap){
                 var id = depMap.id,
-                    mod = getOwn(registry, id);
+                    mod = iMoney.getOwn(registry, id);
 
                 if (!mod) {
                     mod = registry[id] = new Module(depMap);
@@ -498,7 +571,7 @@
             }
             function on(depMap, name, fn) {
                 var id = depMap.id,
-                    mod = getOwn(registry, id);
+                    mod = iMoney.getOwn(registry, id);
                 //depMap
                 if (iMoney.hasProp(defined, id) &&
                         (!mod || mod.defineEmitComplete)) {
@@ -530,18 +603,58 @@
                     globalDefQueue = [];
                 }
             }
-            handlers={
-
-            };
+            function intakeDefines() {
+                var args;
+                takeGlobalQueue();
+                while (defQueue.length) {
+                    args = defQueue.shift();
+                    if (args[0] === null) {
+                        iMoney.error('不匹配的匿名 define() module: ' + args[args.length - 1]);
+                    } else {
+                        callGetModule(args);
+                    }
+                }
+            }
+            handlers={};
+            function removeScript(name) {
+                each(scripts(), function (scriptNode) {
+                    if (scriptNode.getAttribute('data-requiremodule') === name &&
+                        scriptNode.getAttribute('data-requirecontext') === context.contextName) {
+                        scriptNode.parentNode.removeChild(scriptNode);
+                        return true;
+                    }
+                });
+            }
             function cleanRegistry(id) {
                 delete registry[id];
                 delete enabledRegistry[id];
+            }
+            function breakCycle(mod, traced, processed) {
+                var id = mod.map.id;
+                if (mod.error) {
+                    mod.emit('error', mod.error);
+                } else {
+                    traced[id] = true;
+                    each(mod.depMaps, function (depMap, i) {
+                        var depId = depMap.id,
+                            dep = iMoney.getOwn(registry, depId);
+                        if (dep && !mod.depMatched[i] && !processed[depId]) {
+                            if (iMoney.getOwn(traced, depId)) {
+                                mod.defineDep(i, defined[depId]);
+                                mod.check();
+                            } else {
+                                breakCycle(dep, traced, processed);
+                            }
+                        }
+                    });
+                    processed[id] = true;
+                }
             }
             //检查Load状态，如果超时抛出错误
             function checkLoaded(){
                 var waitInterval = config.waitSeconds * 1000,
                     expired = waitInterval && (context.startTime + waitInterval) < new Date().getTime(),
-                    noLoads = [];
+                    noLoads = [],reqCalls = [],needCycleCheck = true,stillLoading = false;
                 if (inCheckLoaded){
                     return;
                 }
@@ -549,15 +662,16 @@
                 eachProp(enabledRegistry,function(mod){
                     var map = mod.map,
                         modId = map.id;
+                    if (!mod.enabled) {
+                        return;
+                    }
+                    if (!map.isDefine) {
+                        reqCalls.push(mod);
+                    }
                     if (!mod.error) {
                         if (!mod.inited && expired) {
-                            if (hasPathFallback(modId)) {
-                                usingPathFallback = true;
-                                stillLoading = true;
-                            } else {
-                                noLoads.push(modId);
-                                removeScript(modId);
-                            }
+                            noLoads.push(modId);
+                            removeScript(modId);
                         } else if (!mod.inited && mod.fetched && map.isDefine) {
                             stillLoading = true;
                             if (!map.prefix) {
@@ -565,15 +679,34 @@
                             }
                         }
                     }
-                })
+                });
+                //如果超过load指定时间,抛出错误
+                if (expired && noLoads.length) {
+                    iMoney.error('Load timeout for modules: ' + noLoads);
+                }
+                //如果需要循环检查，此时模块load失败
+                if (needCycleCheck) {
+                    each(reqCalls, function (mod) {
+                        breakCycle(mod, {}, {});
+                    });
+                }
+                if ((!expired) && stillLoading) {
+                    if (!checkLoadedTimeoutId) {
+                        checkLoadedTimeoutId = setTimeout(function () {
+                            checkLoadedTimeoutId = 0;
+                            checkLoaded();
+                        }, 50);
+                    }
+                }
+                inCheckLoaded = false;
             }
-            function callGetModule(grgs){
+            function callGetModule(args){
                 if (!iMoney.hasProp(defined, args[0])) {
                     getModule(makeModuleMap(args[0], null, true)).init(args[1], args[2]);
                 }
             }
             Module = function(map){
-                this.events = getOwn(undefEvents,map.id) || {};
+                this.events = iMoney.getOwn(undefEvents,map.id) || {};
                 this.map=map;
                 this.depExports = [];
                 this.depMatched = [];
@@ -656,7 +789,7 @@
                     each(this.depMaps,bind(this,function(depMap,i){
                         depMap = makeModuleMap(depMap);
                         this.depMaps[i] = depMap;
-                        handler = getOwn(handlers, depMap.id);
+                        handler = iMoney.getOwn(handlers, depMap.id);
                         this.depCount += 1;
                         on(depMap, 'defined', bind(this, function (depExports) {
                             this.defineDep(i, depExports);
@@ -697,12 +830,22 @@
                 }
             }
             context = {
+                contextName: contextName,
                 configure: function(cfg){
                     if (cfg.baseUrl) {
                         if (cfg.baseUrl.charAt(cfg.baseUrl.length - 1) !== '/') {
                             cfg.baseUrl += '/';
                         }
                     }
+                    eachProp(cfg, function (value, prop) {
+                        config[prop] = value;
+                    });
+                    eachProp(registry, function (mod, id) {
+                        if (!mod.inited) {
+                            mod.map = makeModuleMap(id);
+                        }
+                    });
+
                 },
                 load: function(id, url){
                     require.load(context, id, url);
@@ -711,19 +854,20 @@
                     options = options || {};
                     function localRequire(deps, callback, errback) {
                         var requireMod;
-                        nextTick(function(){
+                        intakeDefines();
+                        iMoney.nextTick(function(){
+                            intakeDefines();
                             requireMod = getModule(makeModuleMap(null, relMap));
                             requireMod.init(deps,callback,errback,{
                                 enabled:true
                             });
+                            checkLoaded();
                         })
-                        
-                        //
                     }
                     return localRequire; 
                 },
                 enable: function(depMap){
-                    var mod = getOwn(registry, depMap.id);
+                    var mod = iMoney.getOwn(registry, depMap.id);
                     if (mod){
                         getModule(depMap).enable();
                     }
@@ -748,7 +892,33 @@
                         }
                         callGetModule(args);
                     }
-                    //checkLoaded();
+                    checkLoaded();
+                },
+                nameToUrl:function(moduleName){
+                    var paths,url='';
+                    paths = config.paths;
+                    if (/^\/|:|\?|\.js$/.test(moduleName)){
+                        url = moduleName + '';
+                    } else {
+                        syms = moduleName.split("/");
+                        for (i = syms.length; i > 0; i -= 1) {
+                            parentModule = syms.slice(0, i).join('/');
+                            parentPath = iMoney.getOwn(paths, parentModule);
+                            if (parentPath) {
+                                //If an array, it means there are a few choices,
+                                //Choose the one that is desired
+                                if (iMoney.isArray(parentPath)) {
+                                    parentPath = parentPath[0];
+                                }
+                                syms.splice(0, i, parentPath);
+                                break;
+                            }
+                        }
+                        url = syms.join('/');
+                        url += '.js';
+                        url = (url.charAt(0) === '/' || url.match(/^[\w]+:/) ? '' : config.baseUrl) + url;
+                    }
+                    return config.urlArgs ? url + ((url.indexOf('?') === -1 ? '?' : '&') + config.urlArgs) : url;
                 },
                 onScriptLoad:function(e){
                     if (e.type === 'load' ||
@@ -760,9 +930,7 @@
                 },
                 onScriptError: function (e) {
                     var data = getScriptData(e);
-                    if (!hasPathFallback(data.id)) {
-                        return onError(makeError('scripterror', 'Script error for: ' + data.id, e, [data.id]));
-                    }
+                    iMoney.error('Script error for: ' + data.id );
                 }
             };
             context.require = context.makeRequire();
@@ -800,7 +968,7 @@
             if (config && config.context) {
                 contextName = config.context;
             }
-            context = getOwn(contexts, contextName);
+            context = iMoney.getOwn(contexts, contextName);
             if (!context) {
                 context = contexts[contextName] = newContext(contextName);
             }
@@ -826,11 +994,7 @@
             node.addEventListener('error', context.onScriptError, false);
             node.src = url;
             currentlyAddingScript = node;
-            if (baseElement) {
-                head.insertBefore(node, baseElement);
-            } else {
-                head.appendChild(node);
-            }
+            head.appendChild(node);
             currentlyAddingScript = null;
             return node;
         };
