@@ -56,60 +56,60 @@ iMoney
 [http://imoney.w3cmm.com](http://imoney.w3cmm.com)
 
 ##基础方法
-
-    //选择id为main的元素
-    $("#main")
-    //选择class为main的元素
-    $(".main")
-    //选择所有的span元素
-    $("span")
-    //返回所有span元素的第2个DOM对象
-    $("span").get(1)
-    //选择id为main的元素的所有span元素
-    $("#main").find("span")
-    $("#main").find("span").first()
-    $("#main").find("span").last()
-    $("#main").find("span").eq(0)
-    $("#main").find("span").map(function(i,element){})
-    //是否包行指定样式
-    $("#main").hasClass(".demo");
-    //增加样式
-    $("#main").addClass(".demo")
-    //移除样式
-    $("#main").removeClass(".demo")
-    //获取属性
-    $("#main").attr("title")
-    //设置属性
-    $("#main").attr("title","标题")
-    //移除属性
-    $("#main").removeAttr("title")
-    //插入文字
-    $("#main").html("文字")
-    //设置data
-    $("#main").data("size","10")
-    //获取data
-    $("#main").data("size")
-    //操作样式
-    $("#main").css(["width","height"]);
-    $("#main").css("width":"100px");
-    $("#main").css({width:"100px",height:"100px"})
-    //json转化成对象
-    $.parseJSON()
-    $.isArray()
-    $.inArray()
-    $.isDocument()
-    $.isWindow()
-    //判断是否是数字
-    $.isNumeric()
-    $.type()
-    //是否单纯的对象
-    $.isPlainObject()
-    //是否空对象
-    $.isEmptyObject()
-    $.each(obj,function(){i,element})
-    //取时间戳
-    $.now()
-
+```javascript
+//选择id为main的元素
+$("#main")
+//选择class为main的元素
+$(".main")
+//选择所有的span元素
+$("span")
+//返回所有span元素的第2个DOM对象
+$("span").get(1)
+//选择id为main的元素的所有span元素
+$("#main").find("span")
+$("#main").find("span").first()
+$("#main").find("span").last()
+$("#main").find("span").eq(0)
+$("#main").find("span").map(function(i,element){})
+//是否包行指定样式
+$("#main").hasClass(".demo");
+//增加样式
+$("#main").addClass(".demo")
+//移除样式
+$("#main").removeClass(".demo")
+//获取属性
+$("#main").attr("title")
+//设置属性
+$("#main").attr("title","标题")
+//移除属性
+$("#main").removeAttr("title")
+//插入文字
+$("#main").html("文字")
+//设置data
+$("#main").data("size","10")
+//获取data
+$("#main").data("size")
+//操作样式
+$("#main").css(["width","height"]);
+$("#main").css("width":"100px");
+$("#main").css({width:"100px",height:"100px"})
+//json转化成对象
+$.parseJSON()
+$.isArray()
+$.inArray()
+$.isDocument()
+$.isWindow()
+//判断是否是数字
+$.isNumeric()
+$.type()
+//是否单纯的对象
+$.isPlainObject()
+//是否空对象
+$.isEmptyObject()
+$.each(obj,function(){i,element})
+//取时间戳
+$.now()
+```
     
 ##模块化
 
@@ -150,31 +150,34 @@ iMoney
     </tbody>
 </table>
 
-    urlArgs: "bust=" +  (new Date()).getTime()
-
 例如：
 
-    $.config({
-        //基础路径
-        baseUrl:'module/'
-    })
-
+```javascript
+$.config({
+    //基础路径
+    baseUrl:'module/'
+})
+```
 #####定义模块
 
 例如：新建`module.js`，`module.js`依赖`run.js`，则
 
-    $.define(["run"],function(run) {
-        console.log("module");
-        return {
-            color: "red",
-            size: "unisize"
-        }
-    });
+```javascript
+$.define(["run"],function(run) {
+    console.log("module");
+    return {
+        color: "red",
+        size: "unisize"
+    }
+});
+```
 
 #####使用模块
 
 例如：依赖module.js，
 
-    $.require(["module"],function(module){
-        console.log(module.color+'----'+module.size)
-    })
+```javascript
+$.require(["module"],function(module){
+    console.log(module.color+'----'+module.size)
+})
+```
