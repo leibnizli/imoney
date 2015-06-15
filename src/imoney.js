@@ -5,7 +5,7 @@
  * Time: 2015-06-03 4:09:00 PM 
 */
 (function(window, undefined) {
-    var rootiMoney,
+    var rootiMoney,classList,
         _$ = window.$,
         classCache = {},
         class2type = {},
@@ -177,87 +177,6 @@
         //返回修改的对象
         return target;
     };
-    //扩展iMoney原型方法
-    iMoney.fn.extend({
-        //iMoney.find(selector, self[i], ret)
-        find: function(selector) {
-            var result = [] ;
-            if (!selector) result = iMoney()
-            if (this.length==1){
-                result = this.pushStack(this[0].querySelectorAll(selector));
-            } else if (this.length>1){
-                result = this.map(function(){
-                    return core_slice.call(this.querySelectorAll(selector))
-                })
-            }
-            result.selector = this.selector ? this.selector + " " + selector : selector;
-            return result;
-        },
-        hasClass: function(name) {
-            if (!name) return false
-            return emptyArray.some.call(this, function(el) {
-                return this.test(el.className)
-            }, classRE(name))
-        },
-        attr: function(name, value) {
-            var isFunc = typeof value == "function"
-            if (typeof value == "string" || typeof value == "number" || isFunc) {
-                return this.each(function(i) {
-                    if (this.nodeType > 1) return
-                    this.setAttribute(
-                        name, isFunc ? value.call(this, i, this.getAttribute(name)) : value
-                    )
-                })
-            }
-            if (typeof name == "object") {
-                return this.each(function(){
-                    for (key in name) this.setAttribute(key,name[key])
-                })
-            }
-            var el = this.get(0)
-            if (!el || el.nodeType > 1) return
-            var attrValue = el.getAttribute(name)
-            if (attrValue == null) {
-                return undefined
-            }
-            if (!attrValue) {
-                return name
-            }
-            return attrValue
-        },
-        removeAttr: function(name) {
-            return this.each(function() {
-                this.nodeType === 1 && name.split(' ').forEach(function(attribute) {
-                    this.removeAttribute(attribute);
-                }, this)
-            })
-        },
-        data: function(name, value) {
-            var attrName = 'data-' + name.replace(/([A-Z])/g, '-$1').toLowerCase()
-            var data = (1 in arguments) ?
-                this.attr(attrName, value) :
-                this.attr(attrName);
-            console.log(data)
-            return data !== null ? data : undefined
-        },
-        //data
-        //code here
-        html: function(htmlString) {
-            if (htmlString == null) {
-                var el = this.get(0)
-                if (!el) return
-                return el.innerHTML
-            }
-            return this.each(function() {
-                this.innerHTML = htmlString
-            })
-        },
-        empty: function() {
-            return this.each(function() {
-                this.innerHTML = ''
-            })
-        }
-    });
     //扩展iMoney方法
     iMoney.extend({
         noConflict: function(deep) {
@@ -281,6 +200,13 @@
         },
         isArray: Array.isArray || function(obj) {
             return iMoney.type(obj) === "array";
+        },
+        inArray: function(el, arr) {
+            var i = arr.length
+            while (i--) {
+                if (arr[i] === el) return true
+            }
+            return false
         },
         isWindow: function(obj) {
             return obj != null && obj == obj.window;
@@ -494,6 +420,150 @@
     });
     iMoney.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
         class2type["[object " + name + "]"] = name.toLowerCase();
+    });
+    //扩展iMoney原型方法
+    iMoney.fn.extend({
+        //iMoney.find(selector, self[i], ret)
+        find: function(selector) {
+            var result = [] ;
+            if (!selector) result = iMoney()
+            if (this.length==1){
+                result = this.pushStack(this[0].querySelectorAll(selector));
+            } else if (this.length>1){
+                result = this.map(function(){
+                    return core_slice.call(this.querySelectorAll(selector))
+                })
+            }
+            result.selector = this.selector ? this.selector + " " + selector : selector;
+            return result;
+        },
+        hasClass: function(name) {
+            if (!name) return false
+            return emptyArray.some.call(this, function(el) {
+                return this.test(el.className)
+            }, classRE(name))
+        },
+        addClass: function(name){
+            if (!name) return this
+            return this.each(function(i){
+                if (!('className' in this)) return;
+                var oldClass = this.className;
+                classList = [];
+                name.split(/\s+/g).forEach(function(kclass){
+                    if (!iMoney(this).hasClass(kclass)) classList.push(kclass);
+                }, this);
+                if (classList.length) {
+                    this.className = oldClass + (oldClass ? " " : "") + classList.join(" ")
+                }
+            })
+        },
+        removeClass:function(name){
+            return this.each(function(i){
+                if (!('className' in this)) return;
+                if (name === undefined) return this.className = "";
+                classList = this.className;
+                name.split(/\s+/g).forEach(function(klass){
+                    classList = classList.replace(classRE(klass)," ");
+                })
+                this.className = classList.trim();
+            })
+        },
+        css: function(property, value) {
+            var valueType = typeof value
+            var isString = valueType == "string"
+            if (isString || valueType == "number") {
+                return this.each(function() {
+                    if (this.nodeType > 1) return
+                    this.style[property] = value;
+                })
+            }
+            if (valueType == "function") {
+                return this.each(function(index) {
+                    if (this.nodeType > 1) return
+                    var oldValue = getComputedStyle(this).getPropertyValue(property)
+                    this.style[property] = value.call(this, index, oldValue)
+                })
+            }
+            if (typeof property == "string") {
+                var el = this.get(0)
+                if (!el || el.nodeType > 1) return
+                return getComputedStyle(el).getPropertyValue(property)
+            }
+            if (iMoney.isArray(property)) {
+                var el = this.get(0)
+                if (!el || el.nodeType > 1) return
+                var o = {}
+                var styles = getComputedStyle(el)
+                var propertyLen = property.length
+                for (var i = 0; i < propertyLen; i++) {
+                    var prop = property[i]
+                    o[prop] = styles.getPropertyValue(prop)
+                }
+                return o
+            }
+            return this.each(function() {
+                if (this.nodeType > 1) return
+                for ( key in property ) {
+                    this.style[key] = property[key]
+                }
+            })
+        },
+        attr: function(name, value) {
+            var isFunc = typeof value == "function"
+            if (typeof value == "string" || typeof value == "number" || isFunc) {
+                return this.each(function(i) {
+                    if (this.nodeType > 1) return
+                    this.setAttribute(
+                        name, isFunc ? value.call(this, i, this.getAttribute(name)) : value
+                    )
+                })
+            }
+            if (typeof name == "object") {
+                return this.each(function(){
+                    for (key in name) this.setAttribute(key,name[key])
+                })
+            }
+            var el = this.get(0)
+            if (!el || el.nodeType > 1) return
+            var attrValue = el.getAttribute(name)
+            if (attrValue == null) {
+                return undefined
+            }
+            if (!attrValue) {
+                return name
+            }
+            return attrValue
+        },
+        removeAttr: function(name) {
+            return this.each(function() {
+                this.nodeType === 1 && name.split(' ').forEach(function(attribute) {
+                    this.removeAttribute(attribute);
+                }, this)
+            })
+        },
+        data: function(name, value) {
+            var attrName = 'data-' + name.replace(/([A-Z])/g, '-$1').toLowerCase()
+            var data = (1 in arguments) ?
+                this.attr(attrName, value) :
+                this.attr(attrName);
+            console.log(data)
+            return data !== null ? data : undefined
+        },
+        html: function(htmlString) {
+            if (htmlString == null) {
+                var el = this.get(0)
+                if (!el) return
+                return el.innerHTML
+            }
+            return this.each(function() {
+                this.innerHTML = htmlString
+            })
+        },
+        empty: function() {
+            return this.each(function() {
+                this.innerHTML = ''
+            })
+        }
     });
     rootiMoney = iMoney(document);
     (function (global) {

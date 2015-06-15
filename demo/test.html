@@ -13,7 +13,7 @@
         <li class="test"></li>
         <li></li>
     </ul>
-    <div id="result" test="123"></div>
+    <div id="result" test="123" class="some test" style="width:100px; height:100px;"></div>
     <script>
     //var $li = $("li");
     // console.log($li);
@@ -22,6 +22,13 @@
     //     console.log(el)
     // })
     var $result = $("#result");
+    //$result.addClass("some test");
+    //$result.removeClass("test some")
+    //console.log( $result.css(["width","height"]))
+    $result.css({
+        width:"200px",
+        height:"300px"
+    })
     // var test = $result.attr("test");
     // console.log(test);
     // $result.removeAttr("test")
@@ -29,7 +36,10 @@
     //    console.log(arguments)
     //}
     //test("a","b")
-    $result.data("name","张三");
+    var result = document.getElementById("result");
+    //console.log(result)
+    //console.log(result.className)
+    //$result.data("name","张三");
     //$result.data("name");
     </script>
 </body>
