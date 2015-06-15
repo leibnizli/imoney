@@ -34,22 +34,16 @@ iMoney.js
         waitSeconds: 3,
         urlArgs: 't='+ Date.now()
     });
-    //定义1个内部模块
-    $.define("wish",function(){
-        return {
-            say:"good"
-        }
-    });
-    //使用3模块
+    //使用2模块
     //一个基于baseUrl的hello模块，一个基于baseUrl+paths规则定义的name模块，一个内部定义的wish模块
-    $.require(["hello","name","wish"], function(Hello,Name, Wish) {
+    $.require(["hello","name"], function(Hello,Name) {
         //此处可以使用类似Zepto的相关api进行业务逻辑操作
         //API地址: http://imoney.w3cmm.com/
         var $result = $("#result");
         $result.attr({
             title:"这里显示的是结果"
         });
-        $("#result").html('<p>' + Hello.say + '</p><p>这里是' + Name.say + '</p><p>'+Wish.say+'</p>') ;
+        $("#result").html('<p>' + Hello.say + '</p><p>这里是' + Name.say + '</p>') ;
     });
     </script>
 </body>
