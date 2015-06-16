@@ -226,21 +226,13 @@
                 class2type[core_toString.call(obj)] || "object" :
                 typeof obj;
         },
-        //判断对象否为纯粹的对象字面量
+        //是否普通的对象
         isPlainObject: function(obj) {
             if (!obj || iMoney.type(obj) !== "object" || obj.nodeType || iMoney.isWindow(obj)) {
                 return false;
             }
-            try {
-                if (obj.constructor && !iMoney.hasProp(obj, "constructor") && !iMoney.hasProp(obj.constructor.prototype, "isPrototypeOf")) {
-                    return false;
-                }
-            } catch (e) {
-                return false;
-            }
             var key;
             for (key in obj) {}
-
             return key === undefined || iMoney.hasProp(obj, key);
         },
         //是否空对象
