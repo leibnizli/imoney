@@ -576,16 +576,15 @@
             head = document.getElementsByTagName('head')[0];
         //循环数组，func返回true中断
         function each(ary, func) {
-                if (ary) {
-                    var i;
-                    for (i = 0; i < ary.length; i += 1) {
-                        if (ary[i] && func(ary[i], i, ary)) {
-                            break;
-                        }
+            if (ary) {
+                var i;
+                for (i = 0; i < ary.length; i += 1) {
+                    if (ary[i] && func(ary[i], i, ary)) {
+                        break;
                     }
                 }
             }
-            //执行fn，其内部this指向fn
+        }
         function bind(obj, fn) {
             return function() {
                 return fn.apply(obj, arguments);
@@ -713,27 +712,27 @@
             }
 
             function breakCycle(mod, traced, processed) {
-                    var id = mod.map.id;
-                    if (mod.error) {
-                        mod.emit('error', mod.error);
-                    } else {
-                        traced[id] = true;
-                        each(mod.depMaps, function(depMap, i) {
-                            var depId = depMap.id,
-                                dep = iMoney.getOwn(registry, depId);
-                            if (dep && !mod.depMatched[i] && !processed[depId]) {
-                                if (iMoney.getOwn(traced, depId)) {
-                                    mod.defineDep(i, defined[depId]);
-                                    mod.check();
-                                } else {
-                                    breakCycle(dep, traced, processed);
-                                }
+                var id = mod.map.id;
+                if (mod.error) {
+                    mod.emit('error', mod.error);
+                } else {
+                    traced[id] = true;
+                    each(mod.depMaps, function(depMap, i) {
+                        var depId = depMap.id,
+                            dep = iMoney.getOwn(registry, depId);
+                        if (dep && !mod.depMatched[i] && !processed[depId]) {
+                            if (iMoney.getOwn(traced, depId)) {
+                                mod.defineDep(i, defined[depId]);
+                                mod.check();
+                            } else {
+                                breakCycle(dep, traced, processed);
                             }
-                        });
-                        processed[id] = true;
-                    }
+                        }
+                    });
+                    processed[id] = true;
                 }
-                //检查Load状态，如果超时抛出错误
+            }
+
             function checkLoaded() {
                 var waitInterval = config.waitSeconds * 1000,
                     expired = waitInterval && (context.startTime + waitInterval) < new Date().getTime(),
