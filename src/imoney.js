@@ -3,9 +3,9 @@
  * Author: Thunk
  * Url: http://imoney.w3cmm.com/
  * Time: 2015-06-03 4:09:00 PM 
-*/
+ */
 (function(window, undefined) {
-    var rootiMoney,classList,
+    var rootiMoney, classList,
         _$ = window.$,
         classCache = {},
         class2type = {},
@@ -16,7 +16,7 @@
         core_push = emptyArray.push,
         core_slice = emptyArray.slice,
         core_indexOf = emptyArray.indexOf,
-        core_some = emptyArray.some;
+        core_some = emptyArray.some,
         core_toString = class2type.toString,
         core_hasOwn = class2type.hasOwnProperty,
         core_trim = core_version.trim,
@@ -29,6 +29,7 @@
         //用来排除空白字符
         core_rnotwhite = /\S+/g,
         rquickExpr = /#([\w-]*)$/;
+
     function classRE(name) {
         return name in classCache ?
             classCache[name] : (classCache[name] = new RegExp('(^|\\s)' + name + '(\\s|$)'))
@@ -56,18 +57,18 @@
                     this.context = document;
                     this.selector = selector;
                     return this;
-                //如果没有指定上下文，或上下文是iMoney对象
+                    //如果没有指定上下文，或上下文是iMoney对象
                 } else if (!context || context.imoney) {
                     return (context || rootiMoney).find(selector);
                 } else {
                     return iMoney(context).find(selector);
                 }
-            //DOM对象
+                //DOM对象
             } else if (selector.nodeType) {
                 this.context = this[0] = selector;
                 this.length = 1;
                 return this;
-            //selector是函数
+                //selector是函数
             } else if (iMoney.isFunction(selector)) {
                 return rootiMoney.ready(selector);
             }
@@ -185,7 +186,7 @@
             }
             return iMoney;
         },
-        ready:function(callback) {
+        ready: function(callback) {
             if (/complete|loaded|interactive/.test(document.readyState) && document.body) {
                 callback();
             } else {
@@ -367,10 +368,10 @@
                 ret = [],
                 i = 0,
                 length = elems.length;
-            inv = !! inv;
+            inv = !!inv;
             //保存数组中通过callback验证的元素
             for (; i < length; i++) {
-                retVal = !! callback(elems[i], i);
+                retVal = !!callback(elems[i], i);
                 if (inv !== retVal) {
                     ret.push(elems[i]);
                 }
@@ -404,10 +405,10 @@
             return ret.concat.apply([], ret);
         },
         //检测obj中是否有prop属性
-        hasProp: function(obj, prop){
+        hasProp: function(obj, prop) {
             return core_hasOwn.call(obj, prop);
         },
-        getOwn: function(obj, prop){
+        getOwn: function(obj, prop) {
             return iMoney.hasProp(obj, prop) && obj[prop];
         },
         nextTick: function(fn) {
@@ -425,12 +426,12 @@
     iMoney.fn.extend({
         //iMoney.find(selector, self[i], ret)
         find: function(selector) {
-            var result = [] ;
+            var result = [];
             if (!selector) result = iMoney()
-            if (this.length==1){
+            if (this.length == 1) {
                 result = this.pushStack(this[0].querySelectorAll(selector));
-            } else if (this.length>1){
-                result = this.map(function(){
+            } else if (this.length > 1) {
+                result = this.map(function() {
                     return core_slice.call(this.querySelectorAll(selector))
                 })
             }
@@ -443,13 +444,13 @@
                 return this.test(el.className)
             }, classRE(name))
         },
-        addClass: function(name){
+        addClass: function(name) {
             if (!name) return this
-            return this.each(function(i){
+            return this.each(function(i) {
                 if (!('className' in this)) return;
                 var oldClass = this.className;
                 classList = [];
-                name.split(/\s+/g).forEach(function(kclass){
+                name.split(/\s+/g).forEach(function(kclass) {
                     if (!iMoney(this).hasClass(kclass)) classList.push(kclass);
                 }, this);
                 if (classList.length) {
@@ -457,13 +458,13 @@
                 }
             })
         },
-        removeClass:function(name){
-            return this.each(function(i){
+        removeClass: function(name) {
+            return this.each(function(i) {
                 if (!('className' in this)) return;
                 if (name === undefined) return this.className = "";
                 classList = this.className;
-                name.split(/\s+/g).forEach(function(klass){
-                    classList = classList.replace(classRE(klass)," ");
+                name.split(/\s+/g).forEach(function(klass) {
+                    classList = classList.replace(classRE(klass), " ");
                 })
                 this.className = classList.trim();
             })
@@ -503,7 +504,7 @@
             }
             return this.each(function() {
                 if (this.nodeType > 1) return
-                for ( key in property ) {
+                for (key in property) {
                     this.style[key] = property[key]
                 }
             })
@@ -519,8 +520,8 @@
                 })
             }
             if (typeof name == "object") {
-                return this.each(function(){
-                    for (key in name) this.setAttribute(key,name[key])
+                return this.each(function() {
+                    for (key in name) this.setAttribute(key, name[key])
                 })
             }
             var el = this.get(0)
@@ -566,33 +567,35 @@
         }
     });
     rootiMoney = iMoney(document);
-    (function (global) {
-        var require, define,baseElement,currentlyAddingScript,
-        globalDefQueue = [],
-        contexts={},
-        defined = {},
-        defContextName = '_',
-        head = document.getElementsByTagName('head')[0];
+    (function(global) {
+        var require, define, baseElement, currentlyAddingScript,
+            globalDefQueue = [],
+            contexts = {},
+            defined = {},
+            defContextName = '_',
+            head = document.getElementsByTagName('head')[0];
         //循环数组，func返回true中断
         function each(ary, func) {
-            if (ary) {
-                var i;
-                for (i = 0; i < ary.length; i += 1) {
-                    if (ary[i] && func(ary[i], i, ary)) {
-                        break;
+                if (ary) {
+                    var i;
+                    for (i = 0; i < ary.length; i += 1) {
+                        if (ary[i] && func(ary[i], i, ary)) {
+                            break;
+                        }
                     }
                 }
             }
-        }
-        //执行fn，其内部this指向fn
+            //执行fn，其内部this指向fn
         function bind(obj, fn) {
-            return function () {
+            return function() {
                 return fn.apply(obj, arguments);
             };
         }
-        function scripts () {
+
+        function scripts() {
             return document.getElementsByTagName('script');
         }
+
         function eachProp(obj, func) {
             var prop;
             for (prop in obj) {
@@ -603,8 +606,9 @@
                 }
             }
         }
-        function newContext(contextName){
-            var inCheckLoaded,context,Module,handlers,checkLoadedTimeoutId,
+
+        function newContext(contextName) {
+            var inCheckLoaded, context, Module, handlers, checkLoadedTimeoutId,
                 enabledRegistry = {},
                 config = {
                     waitSeconds: 7,
@@ -615,22 +619,25 @@
                 defQueue = [],
                 urlFetched = {},
                 undefEvents = {},
-                requireCounter=1;
-            function makeModuleMap(name, parentModuleMap, isNormalized, applyMap){
-                var originalName = name,isDefine = true;
+                requireCounter = 1;
+
+            function makeModuleMap(name, parentModuleMap, isNormalized, applyMap) {
+                var originalName = name,
+                    isDefine = true;
                 if (!name) {
                     isDefine = false;
                     name = '_@' + (requireCounter += 1);
                 }
                 return {
-                    originalName:originalName,
+                    originalName: originalName,
                     isDefine: isDefine,
-                    map:name,
-                    id:name,
-                    url:context.nameToUrl(name)
+                    map: name,
+                    id: name,
+                    url: context.nameToUrl(name)
                 };
             }
-            function getModule(depMap){
+
+            function getModule(depMap) {
                 var id = depMap.id,
                     mod = iMoney.getOwn(registry, id);
 
@@ -639,12 +646,13 @@
                 }
                 return mod;
             }
+
             function on(depMap, name, fn) {
                 var id = depMap.id,
                     mod = iMoney.getOwn(registry, id);
                 //depMap
                 if (iMoney.hasProp(defined, id) &&
-                        (!mod || mod.defineEmitComplete)) {
+                    (!mod || mod.defineEmitComplete)) {
                     if (name === 'defined') {
                         fn(defined[id]);
                     }
@@ -657,6 +665,7 @@
                     }
                 }
             }
+
             function getScriptData(e) {
                 var node = e.currentTarget || e.srcElement;
                 node.removeEventListener('load', context.onScriptLoad, false);
@@ -666,13 +675,14 @@
                     id: node && node.getAttribute('data-requiremodule')
                 };
             }
+
             function takeGlobalQueue() {
                 if (globalDefQueue.length) {
-                    core_splice.apply(defQueue,
-                               [defQueue.length, 0].concat(globalDefQueue));
+                    core_splice.apply(defQueue, [defQueue.length, 0].concat(globalDefQueue));
                     globalDefQueue = [];
                 }
             }
+
             function intakeDefines() {
                 var args;
                 takeGlobalQueue();
@@ -685,9 +695,10 @@
                     }
                 }
             }
-            handlers={};
+            handlers = {};
+
             function removeScript(name) {
-                each(scripts(), function (scriptNode) {
+                each(scripts(), function(scriptNode) {
                     if (scriptNode.getAttribute('data-requiremodule') === name &&
                         scriptNode.getAttribute('data-requirecontext') === context.contextName) {
                         scriptNode.parentNode.removeChild(scriptNode);
@@ -695,41 +706,46 @@
                     }
                 });
             }
+
             function cleanRegistry(id) {
                 delete registry[id];
                 delete enabledRegistry[id];
             }
+
             function breakCycle(mod, traced, processed) {
-                var id = mod.map.id;
-                if (mod.error) {
-                    mod.emit('error', mod.error);
-                } else {
-                    traced[id] = true;
-                    each(mod.depMaps, function (depMap, i) {
-                        var depId = depMap.id,
-                            dep = iMoney.getOwn(registry, depId);
-                        if (dep && !mod.depMatched[i] && !processed[depId]) {
-                            if (iMoney.getOwn(traced, depId)) {
-                                mod.defineDep(i, defined[depId]);
-                                mod.check();
-                            } else {
-                                breakCycle(dep, traced, processed);
+                    var id = mod.map.id;
+                    if (mod.error) {
+                        mod.emit('error', mod.error);
+                    } else {
+                        traced[id] = true;
+                        each(mod.depMaps, function(depMap, i) {
+                            var depId = depMap.id,
+                                dep = iMoney.getOwn(registry, depId);
+                            if (dep && !mod.depMatched[i] && !processed[depId]) {
+                                if (iMoney.getOwn(traced, depId)) {
+                                    mod.defineDep(i, defined[depId]);
+                                    mod.check();
+                                } else {
+                                    breakCycle(dep, traced, processed);
+                                }
                             }
-                        }
-                    });
-                    processed[id] = true;
+                        });
+                        processed[id] = true;
+                    }
                 }
-            }
-            //检查Load状态，如果超时抛出错误
-            function checkLoaded(){
+                //检查Load状态，如果超时抛出错误
+            function checkLoaded() {
                 var waitInterval = config.waitSeconds * 1000,
                     expired = waitInterval && (context.startTime + waitInterval) < new Date().getTime(),
-                    noLoads = [],reqCalls = [],needCycleCheck = true,stillLoading = false;
-                if (inCheckLoaded){
+                    noLoads = [],
+                    reqCalls = [],
+                    needCycleCheck = true,
+                    stillLoading = false;
+                if (inCheckLoaded) {
                     return;
                 }
                 inCheckLoaded = true;
-                eachProp(enabledRegistry,function(mod){
+                eachProp(enabledRegistry, function(mod) {
                     var map = mod.map,
                         modId = map.id;
                     if (!mod.enabled) {
@@ -756,13 +772,13 @@
                 }
                 //如果需要循环检查，此时模块load失败
                 if (needCycleCheck) {
-                    each(reqCalls, function (mod) {
+                    each(reqCalls, function(mod) {
                         breakCycle(mod, {}, {});
                     });
                 }
                 if ((!expired) && stillLoading) {
                     if (!checkLoadedTimeoutId) {
-                        checkLoadedTimeoutId = setTimeout(function () {
+                        checkLoadedTimeoutId = setTimeout(function() {
                             checkLoadedTimeoutId = 0;
                             checkLoaded();
                         }, 50);
@@ -770,20 +786,21 @@
                 }
                 inCheckLoaded = false;
             }
-            function callGetModule(args){
+
+            function callGetModule(args) {
                 if (!iMoney.hasProp(defined, args[0])) {
                     getModule(makeModuleMap(args[0], null, true)).init(args[1], args[2]);
                 }
             }
-            Module = function(map){
-                this.events = iMoney.getOwn(undefEvents,map.id) || {};
-                this.map=map;
+            Module = function(map) {
+                this.events = iMoney.getOwn(undefEvents, map.id) || {};
+                this.map = map;
                 this.depExports = [];
                 this.depMatched = [];
-                this.depCount=0;
+                this.depCount = 0;
             }
             Module.prototype = {
-                init:function(depMaps,factory,errback,options){
+                init: function(depMaps, factory, errback, options) {
                     options = options || {};
                     if (this.inited) {
                         return;
@@ -793,51 +810,50 @@
                     this.depMaps = depMaps && depMaps.slice(0);
                     this.errback = errback;
                     this.inited = true;
-                    if (options.enabled||this.enabled) {
+                    if (options.enabled || this.enabled) {
                         this.enable();
                     } else {
                         this.check();
                     }
                 },
-                defineDep: function(i,depExports){
+                defineDep: function(i, depExports) {
                     if (!this.depMatched[i]) {
                         this.depMatched[i] = true;
                         this.depCount -= 1;
                         this.depExports[i] = depExports;
                     }
                 },
-                fetch:function(){
-                    if (this.fetched){
+                fetch: function() {
+                    if (this.fetched) {
                         return;
                     }
                     this.fetched = true;
                     context.startTime = (new Date()).getTime();
-                    if (this.shim){
-                    } else {
+                    if (this.shim) {} else {
                         this.load();
                     }
                 },
-                load: function(){
+                load: function() {
                     var url = this.map.url;
                     if (!urlFetched[url]) {
                         urlFetched[url] = true;
                         context.load(this.map.id, url);
                     }
                 },
-                check: function(){
-                    if (!this.enabled || this.enabling){
+                check: function() {
+                    if (!this.enabled || this.enabling) {
                         return;
                     }
                     var id = this.map.id,
                         depExports = this.depExports,
                         exports = this.exports,
                         factory = this.factory;
-                    if (!this.inited){
+                    if (!this.inited) {
                         this.fetch();
-                    } else if (!this.defining){
+                    } else if (!this.defining) {
                         this.defining = true;
-                        if (this.depCount < 1 && !this.defined){
-                            if (iMoney.isFunction(factory)){
+                        if (this.depCount < 1 && !this.defined) {
+                            if (iMoney.isFunction(factory)) {
                                 exports = context.execCb(id, factory, depExports, exports);
                             }
                             this.exports = exports;
@@ -856,12 +872,12 @@
                     enabledRegistry[this.map.id] = this;
                     this.enabled = true;
                     this.enabling = true;
-                    each(this.depMaps,bind(this,function(depMap,i){
+                    each(this.depMaps, bind(this, function(depMap, i) {
                         depMap = makeModuleMap(depMap);
                         this.depMaps[i] = depMap;
                         handler = iMoney.getOwn(handlers, depMap.id);
                         this.depCount += 1;
-                        on(depMap, 'defined', bind(this, function (depExports) {
+                        on(depMap, 'defined', bind(this, function(depExports) {
                             this.defineDep(i, depExports);
                             this.check();
                         }));
@@ -882,7 +898,7 @@
                     this.check();
                 },
                 //把cb推入this.events
-                on: function(name,cb){
+                on: function(name, cb) {
                     var cbs = this.events[name];
                     if (!cbs) {
                         cbs = this.events[name] = [];
@@ -890,64 +906,65 @@
                     cbs.push(cb);
                 },
                 //执行this.events[name]
-                emit: function(name,evt){
-                    each(this.events[name],function(cb){
+                emit: function(name, evt) {
+                    each(this.events[name], function(cb) {
                         cb(evt);
                     });
-                    if ( name === "error") {
+                    if (name === "error") {
                         delete this.event[name];
                     }
                 }
             }
             context = {
                 contextName: contextName,
-                configure: function(cfg){
+                configure: function(cfg) {
                     if (cfg.baseUrl) {
                         if (cfg.baseUrl.charAt(cfg.baseUrl.length - 1) !== '/') {
                             cfg.baseUrl += '/';
                         }
                     }
-                    eachProp(cfg, function (value, prop) {
+                    eachProp(cfg, function(value, prop) {
                         config[prop] = value;
                     });
-                    eachProp(registry, function (mod, id) {
+                    eachProp(registry, function(mod, id) {
                         if (!mod.inited) {
                             mod.map = makeModuleMap(id);
                         }
                     });
 
                 },
-                load: function(id, url){
+                load: function(id, url) {
                     require.load(context, id, url);
                 },
-                makeRequire:function(relMap, options) {
+                makeRequire: function(relMap, options) {
                     options = options || {};
+
                     function localRequire(deps, callback, errback) {
                         var requireMod;
                         intakeDefines();
-                        iMoney.nextTick(function(){
+                        iMoney.nextTick(function() {
                             intakeDefines();
                             requireMod = getModule(makeModuleMap(null, relMap));
-                            requireMod.init(deps,callback,errback,{
-                                enabled:true
+                            requireMod.init(deps, callback, errback, {
+                                enabled: true
                             });
                             checkLoaded();
                         })
                     }
-                    return localRequire; 
+                    return localRequire;
                 },
-                enable: function(depMap){
+                enable: function(depMap) {
                     var mod = iMoney.getOwn(registry, depMap.id);
-                    if (mod){
+                    if (mod) {
                         getModule(depMap).enable();
                     }
                 },
-                execCb: function(name, callback, args, exports){
+                execCb: function(name, callback, args, exports) {
                     return callback.apply(exports, args);
                 },
                 //模块载入完成后
-                completeLoad:function(moduleName){
-                    var found,mod;
+                completeLoad: function(moduleName) {
+                    var found, mod;
                     takeGlobalQueue();
                     while (defQueue.length) {
                         args = defQueue.shift();
@@ -964,10 +981,10 @@
                     }
                     checkLoaded();
                 },
-                nameToUrl:function(moduleName){
-                    var paths,url='';
+                nameToUrl: function(moduleName) {
+                    var paths, url = '';
                     paths = config.paths;
-                    if (/^\/|:|\?|\.js$/.test(moduleName)){
+                    if (/^\/|:|\?|\.js$/.test(moduleName)) {
                         url = moduleName + '';
                     } else {
                         syms = moduleName.split("/");
@@ -975,8 +992,6 @@
                             parentModule = syms.slice(0, i).join('/');
                             parentPath = iMoney.getOwn(paths, parentModule);
                             if (parentPath) {
-                                //If an array, it means there are a few choices,
-                                //Choose the one that is desired
                                 if (iMoney.isArray(parentPath)) {
                                     parentPath = parentPath[0];
                                 }
@@ -990,23 +1005,23 @@
                     }
                     return config.urlArgs ? url + ((url.indexOf('?') === -1 ? '?' : '&') + config.urlArgs) : url;
                 },
-                onScriptLoad:function(e){
+                onScriptLoad: function(e) {
                     if (e.type === 'load' ||
-                            (/^(complete|loaded)$/.test((e.currentTarget).readyState))) {
+                        (/^(complete|loaded)$/.test((e.currentTarget).readyState))) {
                         interactiveScript = null;
                         var data = getScriptData(e);
                         context.completeLoad(data.id);
                     }
                 },
-                onScriptError: function (e) {
+                onScriptError: function(e) {
                     var data = getScriptData(e);
-                    iMoney.error('Script error for: ' + data.id );
+                    iMoney.error('Script error for: ' + data.id);
                 }
             };
             context.require = context.makeRequire();
             return context;
         }
-        define = function (name, deps, callback) {
+        define = function(name, deps, callback) {
             if (typeof name !== 'string') {
                 callback = deps;
                 deps = name;
@@ -1021,9 +1036,9 @@
             }
             globalDefQueue.push([name, deps, callback]);
         };
-        require=function (deps, callback, errback, optional) {
+        require = function(deps, callback, errback, optional) {
             var context, config,
-            contextName = defContextName;
+                contextName = defContextName;
             //deps是配置对象
             if (!iMoney.isArray(deps) && typeof deps !== 'string') {
                 config = deps;
@@ -1047,14 +1062,14 @@
             }
             return context.require(deps, callback, errback);
         };
-        require.createNode = function(config, moduleName, url){
+        require.createNode = function(config, moduleName, url) {
             var node = document.createElement('script');
             node.type = "text/javascript";
             node.charset = config.charset || 'utf-8';
             node.async = true;
             return node
         };
-        require.load = function (context, moduleName, url){
+        require.load = function(context, moduleName, url) {
             var config = (context && context.config) || {},
                 node;
             node = require.createNode(config, moduleName, url);
@@ -1068,7 +1083,7 @@
             currentlyAddingScript = null;
             return node;
         };
-        iMoney.config = function(config){
+        iMoney.config = function(config) {
             return require(config);
         }
         iMoney.define = define;
