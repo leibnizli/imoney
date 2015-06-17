@@ -5,6 +5,9 @@
     <meta charset="UTF-8" />
     <title>iMoney demo</title>
     <script src="../src/imoney.js"></script>
+    <style>
+        .content {border:solid 1px red; }
+    </style>
 </head>
 
 <body>
@@ -13,7 +16,9 @@
         <li class="test"></li>
         <li></li>
     </ul>
-    <div id="result" test="123" class="some test" style="width:100px; height:100px;"></div>
+    <div id="result" test="123" class="some test" style="width:100px; height:100px;">
+        <p class="content">content</p>
+    </div>
     <script>
     //var $li = $("li");
     // console.log($li);
@@ -25,10 +30,10 @@
     //$result.addClass("some test");
     //$result.removeClass("test some")
     //console.log( $result.css(["width","height"]))
-    $result.css({
-        width:"200px",
-        height:"300px"
-    })
+    // $result.css({
+    //     width:"200px",
+    //     height:"300px"
+    // })
     // var test = $result.attr("test");
     // console.log(test);
     // $result.removeAttr("test")
@@ -37,12 +42,19 @@
     //}
     //test("a","b")
     //var result = document.getElementById("result");
-    var a = $.isPlainObject({name:"张三"});
-    console.log(a)
+    // var a = $.isPlainObject({name:"张三"});
+    // console.log(a)
     //console.log(result)
     //console.log(result.className)
     //$result.data("name","张三");
     //$result.data("name");
+    //var json = $.stringifyJSON({name:"张三"});
+    //$result.html(json)
+    //$result.append("append");
+    //$result.after("after");
+    //$result.prepend("prepend");
+    //$result.before("before");
+    $result.remove();
     </script>
 </body>
 

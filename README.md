@@ -43,7 +43,7 @@ iMoney.js
         $result.attr({
             title:"这里显示的是结果"
         });
-        $("#result").html('<p>' + Hello.say + '</p><p>这里是' + Name.say + '</p>') ;
+        $result.html('<p>' + Hello.say + '</p><p>这里是' + Name.say + '</p>') ;
     });
     </script>
 </body>

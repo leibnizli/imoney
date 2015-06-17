@@ -29,11 +29,6 @@
         //用来排除空白字符
         core_rnotwhite = /\S+/g,
         rquickExpr = /#([\w-]*)$/;
-
-    function classRE(name) {
-        return name in classCache ?
-            classCache[name] : (classCache[name] = new RegExp('(^|\\s)' + name + '(\\s|$)'))
-    }
     var iMoney = function(selector, context) {
         return new iMoney.fn.init(selector, context, rootiMoney);
     };
@@ -407,6 +402,7 @@
             setTimeout(fn, 4);
         },
         parseJSON: JSON.parse,
+        stringifyJSON: JSON.stringify,
         now: function() {
             return (new Date()).getTime();
         }
@@ -414,6 +410,30 @@
     iMoney.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
         class2type["[object " + name + "]"] = name.toLowerCase();
     });
+    var insertHTML = function(position, args) {
+        var argsLen = args.length
+        var contents = args
+        if (argsLen > 1 && position.indexOf("after") > -1) {
+            contents = []
+            var i = argsLen
+            while (i--) {
+                contents.push(args[i])
+            }
+        }
+        for (var i=0; i<argsLen; i++){
+            var content = contents[i]
+            if (typeof content == "string" || typeof content == "number") {
+                this.each(function() {
+                    this.insertAdjacentHTML(position, content)
+                })
+            }
+        }
+
+    };
+    var classRE = function (name) {
+        return name in classCache ?
+            classCache[name] : (classCache[name] = new RegExp('(^|\\s)' + name + '(\\s|$)'))
+    };
     //扩展iMoney原型方法
     iMoney.fn.extend({
         //iMoney.find(selector, self[i], ret)
@@ -552,9 +572,31 @@
                 this.innerHTML = htmlString
             })
         },
+        before:function(){
+            insertHTML.call(this,"beforebegin", arguments)
+            return this;
+        },
+        prepend: function(){
+            insertHTML.call(this,"afterbegin", arguments)
+            return this;
+        },
+        append: function(){
+            insertHTML.call(this, "beforeend", arguments)
+            return this;
+        },
+        after: function(){
+            insertHTML.call(this, "afterend", arguments)
+            return this;
+        },
         empty: function() {
             return this.each(function() {
                 this.innerHTML = ''
+            })
+        },
+        remove: function() {
+            return this.each(function() {
+                if (this.parentNode != null)
+                    this.parentNode.removeChild(this)
             })
         }
     });
