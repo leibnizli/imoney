@@ -17,7 +17,8 @@
         <li></li>
     </ul>
     <div id="result" test="123" class="some test" style="width:100px; height:100px;">
-        <p class="content">content</p>
+        <p class="content1">content</p>
+        <p class="content">conten2t</p>
     </div>
     <script>
     //var $li = $("li");
@@ -27,6 +28,7 @@
     //     console.log(el)
     // })
     var $result = $("#result");
+    console.log($result.children(".content1"))
     //$result.addClass("some test");
     //$result.removeClass("test some")
     //console.log( $result.css(["width","height"]))
@@ -54,7 +56,7 @@
     //$result.after("after");
     //$result.prepend("prepend");
     //$result.before("before");
-    $result.remove();
+    //$result.remove();
     </script>
 </body>
 

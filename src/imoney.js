@@ -434,6 +434,20 @@
         return name in classCache ?
             classCache[name] : (classCache[name] = new RegExp('(^|\\s)' + name + '(\\s|$)'))
     };
+    var matches = (function() {
+        var names = [
+            "mozMatchesSelector",
+            "webkitMatchesSelector",
+            "msMatchesSelector",
+            "matches"
+        ]
+        var i = names.length
+        while (i--) {
+            var name = names[i]
+            if (!Element.prototype[name]) continue
+            return name
+        }
+    }());
     //扩展iMoney原型方法
     iMoney.fn.extend({
         //iMoney.find(selector, self[i], ret)
@@ -587,6 +601,36 @@
         after: function(){
             insertHTML.call(this, "afterend", arguments)
             return this;
+        },
+        is: function(selector, element) {
+            var set = element ? [element] : this.get()
+            var setLen = set.length
+            if (typeof selector == "string") {
+                for (var i = 0; i < setLen; i++) {
+                    var el = set[i]
+                    if (el.nodeType > 1) continue
+                    if (el[matches](selector)) {
+                        return true
+                    }
+                }
+                return false
+            }
+        },
+        children: function(selector) {
+            var dom = []
+            var self = this
+            this.each(function() {
+                if (this.nodeType > 1) return
+                var nodes = this.children
+                var nodesLen = nodes.length
+                for (var i = 0; i < nodesLen; i++) {
+                    var node = nodes[i]
+                    if (!selector || self.is(selector, node)) {
+                        dom.push(node)
+                    }
+                }
+            })
+            return this.pushStack(dom)
         },
         empty: function() {
             return this.each(function() {

@@ -109,6 +109,10 @@ $("#main").after("after");
 $("#main").empty();
 //移除
 $("#main").remove();
+//子节点
+$("#main").children();
+//类名为item的子节点
+$("#main").children(".item");
 //json转化成对象
 $.parseJSON()
 //把对象转化为JSON字符串
@@ -123,6 +127,7 @@ $.isDocument()
 $.isWindow()
 //判断是否是数字
 $.isNumeric()
+//type
 $.type()
 //是否普通的对象
 $.isPlainObject()
