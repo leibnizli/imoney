@@ -23,8 +23,17 @@ module.exports = function(grunt) {
             //具体任务配置
             build: {
                 files: {
-                    '<%= dirs.dest %>/imoney.min.js': ['<%= dirs.src %>/imoney.js']
-                }
+                    '<%= dirs.dest %>/*.js': ['<%= dirs.src %>/imoney.js']
+                },
+                files: [{
+                    expand: true,
+                    //目录
+                    cwd: '<%= dirs.src %>',
+                    src: ['*.js', '!*.min.js'],
+                    //输出目录
+                    dest: '<%= dirs.dest %>',
+                    ext: '.min.js'
+                }]
             }
         }
 

@@ -7,6 +7,7 @@
     <script src="../src/imoney.js"></script>
     <style>
         .content {border:solid 1px red; }
+        #result { background:#bbb; }
     </style>
 </head>
 
@@ -28,7 +29,7 @@
     //     console.log(el)
     // })
     var $result = $("#result");
-    console.log($result.children(".content1"))
+    //console.log($result.children(".content1"))
     //$result.addClass("some test");
     //$result.removeClass("test some")
     //console.log( $result.css(["width","height"]))
@@ -57,6 +58,14 @@
     //$result.prepend("prepend");
     //$result.before("before");
     //$result.remove();
+    $.require(["../src/event"],function(){
+        $result.on("click.name",function(){
+            $result.off("name");
+            console.log("张三")
+        })
+        
+    })
+
     </script>
 </body>
 

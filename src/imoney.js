@@ -128,6 +128,7 @@
         indexOf: core_indexOf,
     }
     iMoney.fn.init.prototype = iMoney.fn;
+    rootiMoney = iMoney(document);
     iMoney.extend = iMoney.fn.extend = function() {
         var options, name, src, copy, copyIsArray, clone,
             target = arguments[0] || {},
@@ -644,7 +645,6 @@
             })
         }
     });
-    rootiMoney = iMoney(document);
     (function(global) {
         var require, define, baseElement, currentlyAddingScript,
             globalDefQueue = [],
