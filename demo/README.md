@@ -113,10 +113,6 @@ $("#main").remove();
 $("#main").children();
 //类名为item的子节点
 $("#main").children(".item");
-//json转化成对象
-$.parseJSON()
-//把对象转化为JSON字符串
-$.stringifyJSON({name:"张三"});
 //是否数组
 $.isArray()
 //是否数组中的项

@@ -21,6 +21,9 @@
         <p class="content1">content</p>
         <p class="content">conten2t</p>
     </div>
+    <form name="login" id="login">
+        <input type="text" value="123" name="name">
+    </form>
     <script>
     //var $li = $("li");
     // console.log($li);
@@ -28,7 +31,7 @@
     //     console.log(this)
     //     console.log(el)
     // })
-    var $result = $("#result");
+    //var $result = $("#result");
     //console.log($result.children(".content1"))
     //$result.addClass("some test");
     //$result.removeClass("test some")
@@ -58,14 +61,42 @@
     //$result.prepend("prepend");
     //$result.before("before");
     //$result.remove();
-    $.require(["../src/event"],function(){
-        $result.on("click.name",function(){
-            $result.off("name");
-            console.log("张三")
-        })
+    // $.require(["../src/event"],function(){
+    //     $result.on("touchstart.name",function(){
+    //         $result.off("name");
+    //         console.log("张三")
+    //     })
+        
+    // })
+    //配置包
+    // $.config({
+    //     baseUrl: "modules",
+    //     paths: {
+    //         "name": "model/getName"
+    //     },
+    //     waitSeconds: 3,
+    //     urlArgs: 't='+ Date.now()
+    // });
+    //使用2模块
+    //一个基于baseUrl的hello模块，一个基于baseUrl+paths规则定义的name模块
+    // $.require(["modules/hello"], function(Hello,Name) {
+    //     console.log("main")
+    //     return {}
+    //     //此处可以使用类似Zepto的相关api进行业务逻辑操作
+    //     //API地址: http://imoney.w3cmm.com/
+    //     // var $result = $("#result");
+    //     // $result.attr({
+    //     //     title:"这里显示的是结果"
+    //     // });
+    //     //$("#result").html('<p>' + Hello.say + '</p><p>这里是' + Name.say + '</p>') ;
+    // });
+    //form
+    $.require(["../src/form"],function(){
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", "server.php");
+        xhr.send($("#login").serialize());
         
     })
-
     </script>
 </body>
 

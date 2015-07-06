@@ -402,8 +402,6 @@
         nextTick: function(fn) {
             setTimeout(fn, 4);
         },
-        parseJSON: JSON.parse,
-        stringifyJSON: JSON.stringify,
         now: function() {
             return (new Date()).getTime();
         }
@@ -492,7 +490,7 @@
                 classList = this.className;
                 name.split(/\s+/g).forEach(function(klass) {
                     classList = classList.replace(classRE(klass), " ");
-                })
+                });
                 this.className = classList.trim();
             })
         },
@@ -906,9 +904,7 @@
                     }
                     this.fetched = true;
                     context.startTime = (new Date()).getTime();
-                    if (this.shim) {} else {
-                        this.load();
-                    }
+                    this.load();
                 },
                 load: function() {
                     var url = this.map.url;
