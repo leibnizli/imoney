@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>iMoney test</title>
+    <script src="../src/imoney.js"></script>
+</head>
+<body>
+    <script>
+    $.require(["../src/cookie"],function(){
+        $.cookie("name","iMoney");
+        console.log($.cookie());
+        $.removeCookie("name");
+        console.log($.cookie());
+    })
+    </script>
+</body>
+
+</html>
