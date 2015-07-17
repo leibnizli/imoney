@@ -1,6 +1,6 @@
 <?php
-    $name = isset($_POST['name'])? $_POST['name'] : '';
-    $age = isset($_POST['age'])? $_POST['age'] : '';
+    $name = isset($_GET['name'])? $_GET['name'] : '';
+    $age = isset($_GET['age'])? $_GET['age'] : '';
     $response = array();
     $response['name'] = $name;
     $response['age'] = $age;

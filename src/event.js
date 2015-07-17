@@ -48,7 +48,7 @@ $.define(function () {
     var getEventsToRemove = function(domElement, event) {
         return Object.keys(getEvents(domElement)).filter(function(prop) {
             return splitNamespaces(event).every(function(name) {
-                return iMoney.inArray(name, splitNamespaces(prop))
+                return iMoney.isInArray(name, splitNamespaces(prop))
             })
         })
     }

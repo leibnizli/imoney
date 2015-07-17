@@ -205,3 +205,110 @@ $.require(["module"],function(module){
     console.log(module.color+'----'+module.size)
 })
 ```
+##表单
+
+```javascript
+$.require(["../src/form"],function(){
+    //序列化表单数据
+    var data = $("#login").serialize();
+    console.log(data);
+})
+
+```
+
+##事件
+
+```javascript
+$.require(["../src/event"], function() {
+    $result = $("#result");
+    var i=0;
+    //绑定命名空间
+    $result.on("touchstart.name", function() {
+        i++;
+        if (i>=2) {
+            //基于命名空间移除事件
+            $result.off("name");
+        }
+        console.log("iMoney.js");
+    });
+    //绑定事件
+    $result.on("touchend", function() {
+        //移除事件
+        $result.off("touchend");
+        console.log("--touchend");
+    });
+});
+```
+
+##cookie
+
+```javascript
+$.require(["../src/cookie"],function(){
+    //添加cookie
+    $.cookie("name","iMoney");
+    console.log($.cookie());
+    //移除cookie
+    $.removeCookie("name");
+    console.log($.cookie());
+})
+```
+
+
+##$.ajax
+
+#####get请求
+
+```javascript
+$.require(["../src/ajax"], function() {
+    $.ajax({
+        url: "jsonp.php",
+        type: "get",
+        data: {
+            name: "iMoney"
+        },
+        success: function(data) {
+            console.log(data)
+        }
+    })
+});
+```
+
+#####post请求
+
+```javascript
+$.require(["../src/ajax"], function() {
+    $.ajax({
+        url: "jsonp.php",
+        type: "post",
+        data: {
+            name: "iMoney"
+        },
+        success: function(data) {
+            console.log(data)
+        }
+    })
+});
+```
+
+#####jsonp请求
+
+```javascript
+$.require(["../src/ajax"], function() {
+    $.ajax({
+        dataType: "jsonp",
+        url: "jsonp.php",
+        type: "get",
+        data: {
+            name: "iMoney"
+        },
+        success: function(data) {
+            console.log(data)
+        }
+    })
+});
+```
+
+
+
+
+

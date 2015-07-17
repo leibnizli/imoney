@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>iMoney demo</title>
+    <script src="../src/imoney.js"></script>
+    <style>
+        .content {border:solid 1px red; }
+        #result { background:#bbb; }
+    </style>
+</head>
+
+<body>
+    <form name="login" id="login">
+        <input type="text" value="123" name="name">
+    </form>
+    <script>
+    //form
+    $.require(["../src/form"],function(){
+        var data = $("#login").serialize();
+        console.log(data)
+    })
+    </script>
+</body>
+
+</html>

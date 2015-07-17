@@ -198,7 +198,7 @@
         isArray: Array.isArray || function(obj) {
             return iMoney.type(obj) === "array";
         },
-        inArray: function(el, arr) {
+        isInArray: function(el, arr) {
             var i = arr.length
             while (i--) {
                 if (arr[i] === el) return true
