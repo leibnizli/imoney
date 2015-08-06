@@ -250,7 +250,7 @@ $.require(["../src/cookie"],function(){
     //移除cookie
     $.removeCookie("name");
     console.log($.cookie());
-})
+});
 ```
 
 

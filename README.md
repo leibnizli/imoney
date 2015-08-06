@@ -53,3 +53,7 @@ iMoney.js
 ##API
 
 [http://imoney.w3cmm.com](http://imoney.w3cmm.com)
+
+##Examples
+
+[https://github.com/stormtea123/iMoney-examples](Examples)

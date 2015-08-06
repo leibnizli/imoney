@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>iMoney 示例</title>
+    <script src="../src/imoney.js"></script>
+</head>
+
+<body>
+    <div id="result"></div>
+    <script>
+    //配置包
+    $.config({
+        baseUrl: "modules",
+        paths: {
+            baseUrl: "imoney-module",
+        },
+        waitSeconds: 3,
+        urlArgs: 't='+ Date.now()
+    });
+    //开发环境
+    if (location.href.indexOf("?dev")>0) {
+        $.require("src/bundle");
+    //运行环境
+    } else {
+        $.require("build/bundle");
+    }
+    </script>
+</body>
+
+</html>

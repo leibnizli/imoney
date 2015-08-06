@@ -427,7 +427,6 @@
                 })
             }
         }
-
     };
     var classRE = function (name) {
         return name in classCache ?
@@ -1055,7 +1054,7 @@
                     checkLoaded();
                 },
                 nameToUrl: function(moduleName) {
-                    var paths, url = '';
+                    var paths, syms, url = '';
                     paths = config.paths;
                     if (/^\/|:|\?|\.js$/.test(moduleName)) {
                         url = moduleName + '';
