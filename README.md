@@ -56,4 +56,4 @@ iMoney.js
 
 ##Examples
 
-[https://github.com/stormtea123/iMoney-examples](Examples)
+[Examples](https://github.com/stormtea123/iMoney-examples)
