@@ -419,7 +419,7 @@
                 contents.push(args[i])
             }
         }
-        for (var i=0; i<argsLen; i++){
+        for (var i = 0; i < argsLen; i++) {
             var content = contents[i]
             if (typeof content == "string" || typeof content == "number") {
                 this.each(function() {
@@ -428,7 +428,7 @@
             }
         }
     };
-    var classRE = function (name) {
+    var classRE = function(name) {
         return name in classCache ?
             classCache[name] : (classCache[name] = new RegExp('(^|\\s)' + name + '(\\s|$)'))
     };
@@ -583,19 +583,19 @@
                 this.innerHTML = htmlString
             })
         },
-        before:function(){
-            insertHTML.call(this,"beforebegin", arguments)
+        before: function() {
+            insertHTML.call(this, "beforebegin", arguments)
             return this;
         },
-        prepend: function(){
-            insertHTML.call(this,"afterbegin", arguments)
+        prepend: function() {
+            insertHTML.call(this, "afterbegin", arguments)
             return this;
         },
-        append: function(){
+        append: function() {
             insertHTML.call(this, "beforeend", arguments)
             return this;
         },
-        after: function(){
+        after: function() {
             insertHTML.call(this, "afterend", arguments)
             return this;
         },
@@ -659,6 +659,7 @@
                 }
             }
         }
+
         function bind(obj, fn) {
             return function() {
                 return fn.apply(obj, arguments);
@@ -768,6 +769,7 @@
                     }
                 }
             }
+
             function removeScript(name) {
                 each(scripts(), function(scriptNode) {
                     if (scriptNode.getAttribute('data-requiremodule') === name &&
@@ -942,7 +944,7 @@
                     this.enabled = true;
                     this.enabling = true;
                     each(this.depMaps, bind(this, function(depMap, i) {
-                        var id,mod;
+                        var id, mod;
                         depMap = makeModuleMap(depMap);
                         console.log(this.depMaps)
                         this.depMaps[i] = depMap;
@@ -996,12 +998,11 @@
                     eachProp(cfg, function(value, prop) {
                         config[prop] = value;
                     });
-                    //eachProp(registry, function(mod, id) {
-                    //    if (!mod.inited) {
-                    //        mod.map = makeModuleMap(id);
-                    //    }
-                    //});
-
+                    eachProp(registry, function(mod, id) {
+                        if (!mod.inited) {
+                            mod.map = makeModuleMap(id);
+                        }
+                    });
                 },
                 load: function(id, url) {
                     require.load(context, id, url);
@@ -1021,7 +1022,7 @@
                             requireMod.init(deps, callback, errback, {
                                 enabled: true
                             });
-                            //checkLoaded();
+                            checkLoaded();
                         })
                     }
                     return localRequire;
@@ -1054,7 +1055,7 @@
                     }
                     mod = iMoney.getOwn(registry, moduleName);
                     if (!found && !iMoney.hasProp(defined, moduleName) && mod && !mod.inited) {
-                        callGetModule([moduleName, [], function(){}]);
+                        callGetModule([moduleName, [], function() {}]);
                     }
                     checkLoaded();
                 },
