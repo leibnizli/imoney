@@ -571,7 +571,6 @@
             var data = (1 in arguments) ?
                 this.attr(attrName, value) :
                 this.attr(attrName);
-            console.log(data)
             return data !== null ? data : undefined
         },
         html: function(htmlString) {
@@ -682,7 +681,7 @@
         }
 
         function newContext(contextName) {
-            var inCheckLoaded, context, Module, handlers, checkLoadedTimeoutId,
+            var inCheckLoaded, context, Module, checkLoadedTimeoutId,
                 enabledRegistry = {},
                 config = {
                     waitSeconds: 7,
@@ -769,8 +768,6 @@
                     }
                 }
             }
-            handlers = {};
-
             function removeScript(name) {
                 each(scripts(), function(scriptNode) {
                     if (scriptNode.getAttribute('data-requiremodule') === name &&
@@ -945,9 +942,10 @@
                     this.enabled = true;
                     this.enabling = true;
                     each(this.depMaps, bind(this, function(depMap, i) {
+                        var id,mod;
                         depMap = makeModuleMap(depMap);
+                        console.log(this.depMaps)
                         this.depMaps[i] = depMap;
-                        handler = iMoney.getOwn(handlers, depMap.id);
                         this.depCount += 1;
                         on(depMap, 'defined', bind(this, function(depExports) {
                             this.defineDep(i, depExports);
@@ -962,7 +960,7 @@
                         }
                         id = depMap.id;
                         mod = registry[id];
-                        if (!iMoney.hasProp(handlers, id) && mod && !mod.enabled) {
+                        if (mod && !mod.enabled) {
                             context.enable(depMap, this);
                         }
                     }));
@@ -998,11 +996,11 @@
                     eachProp(cfg, function(value, prop) {
                         config[prop] = value;
                     });
-                    eachProp(registry, function(mod, id) {
-                        if (!mod.inited) {
-                            mod.map = makeModuleMap(id);
-                        }
-                    });
+                    //eachProp(registry, function(mod, id) {
+                    //    if (!mod.inited) {
+                    //        mod.map = makeModuleMap(id);
+                    //    }
+                    //});
 
                 },
                 load: function(id, url) {
@@ -1017,10 +1015,13 @@
                         iMoney.nextTick(function() {
                             intakeDefines();
                             requireMod = getModule(makeModuleMap(null, relMap));
+                            if (typeof deps === "string") {
+                                deps = [deps]
+                            }
                             requireMod.init(deps, callback, errback, {
                                 enabled: true
                             });
-                            checkLoaded();
+                            //checkLoaded();
                         })
                     }
                     return localRequire;
@@ -1050,6 +1051,10 @@
                             found = true;
                         }
                         callGetModule(args);
+                    }
+                    mod = iMoney.getOwn(registry, moduleName);
+                    if (!found && !iMoney.hasProp(defined, moduleName) && mod && !mod.inited) {
+                        callGetModule([moduleName, [], function(){}]);
                     }
                     checkLoaded();
                 },

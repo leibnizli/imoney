@@ -1,48 +1,48 @@
 module.exports = function(grunt) {
 
-    // ¹¹½¨ÈÎÎñÅäÖÃ
+    // æ„å»ºä»»åŠ¡é…ç½®
     grunt.initConfig({
-        //¶ÁÈ¡package.jsonµÄÄÚÈİ£¬ĞÎ³É¸öjsonÊı¾İ
+        //è¯»å–package.jsonçš„å†…å®¹ï¼Œå½¢æˆä¸ªjsonæ•°æ®
         pkg: grunt.file.readJSON('package.json'),
         dirs: {
             src: 'src',
             //dest: 'dist/<%= pkg.name %>/<%= pkg.version %>',
             dest: 'build',
         },
-        //jsÑ¹Ëõ
+        //jså‹ç¼©
         uglify: {
-            //ÎÄ¼şÍ·²¿Êä³öĞÅÏ¢
+            //æ–‡ä»¶å¤´éƒ¨è¾“å‡ºä¿¡æ¯
             options: {
                 banner: '/**\n * Name: <%= pkg.name %> <%= pkg.version %>\n * Author: <%= pkg.author %>\n * Url: <%= pkg.url%>\n * Time: <%= grunt.template.today("yyyy-mm-dd h:MM:ss TT") %> \n*/\n',
                 beautify: {
-                    //ÖĞÎÄascii»¯£¬·Ç³£ÓĞÓÃ£¡·ÀÖ¹ÖĞÎÄÂÒÂëµÄÉñÅäÖÃ
+                    //ä¸­æ–‡asciiåŒ–ï¼Œéå¸¸æœ‰ç”¨ï¼é˜²æ­¢ä¸­æ–‡ä¹±ç çš„ç¥é…ç½®
                     ascii_only: true
                 }
             },
 
-            //¾ßÌåÈÎÎñÅäÖÃ
+            //å…·ä½“ä»»åŠ¡é…ç½®
             build: {
                 files: {
-                    '<%= dirs.dest %>/*.js': ['<%= dirs.src %>/imoney.js']
-                },
-                files: [{
-                    expand: true,
-                    //Ä¿Â¼
-                    cwd: '<%= dirs.src %>',
-                    src: ['*.js', '!*.min.js'],
-                    //Êä³öÄ¿Â¼
-                    dest: '<%= dirs.dest %>',
-                    ext: '.min.js'
-                }]
+                    '<%= dirs.dest %>/imoney.min.js': ['<%= dirs.src %>/imoney.js']
+                }
+                //files: [{
+                //    expand: true,
+                //    //ç›®å½•
+                //    cwd: '<%= dirs.src %>',
+                //    src: ['*.js', '!*.min.js'],
+                //    //è¾“å‡ºç›®å½•
+                //    dest: '<%= dirs.dest %>',
+                //    ext: '.min.js'
+                //}]
             }
         }
 
     });
 
-    //ÔØÈë²å¼ş
+    //è½½å…¥æ’ä»¶
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
-    //×¢²áÈÎÎñ
-    //Ö»ĞèÔÚÃüÁîĞĞÉÏÊäÈë"grunt"£¬¾Í»áÖ´ĞĞdefault task
+    //æ³¨å†Œä»»åŠ¡
+    //åªéœ€åœ¨å‘½ä»¤è¡Œä¸Šè¾“å…¥"grunt"ï¼Œå°±ä¼šæ‰§è¡Œdefault task
     grunt.registerTask('default', ['uglify']);
 };
