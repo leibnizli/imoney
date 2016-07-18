@@ -3,12 +3,6 @@ iMoney.js
 
 `iMoney.js`是一个移动端基础脚本框架。
 
-```html
-//开发版
-<script src="http://imoney.w3cmm.com/1.1.0/imoney.js"></script>
-//压缩版
-<script src="http://imoney.w3cmm.com/1.1.0/imoney.min.js"></script>
-```
 
 ##快速上手
 
@@ -38,7 +32,7 @@ iMoney.js
     //一个基于baseUrl的hello模块，一个基于baseUrl+paths规则定义的name模块，一个内部定义的wish模块
     $.require(["hello","name"], function(Hello,Name) {
         //此处可以使用类似Zepto的相关api进行业务逻辑操作
-        //API地址: http://imoney.w3cmm.com/
+        //API地址: https://github.com/stormtea123/iMoney/wiki
         var $result = $("#result");
         $result.attr({
             title:"这里显示的是结果"
@@ -52,8 +46,5 @@ iMoney.js
 ```
 ##API
 
-[http://imoney.w3cmm.com](http://imoney.w3cmm.com)
+[https://github.com/stormtea123/iMoney/wiki](https://github.com/stormtea123/iMoney/wiki)
 
-##Examples
-
-[Examples](https://github.com/stormtea123/iMoney-examples)
