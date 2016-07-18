@@ -1,7 +1,11 @@
 iMoney.js
+
+![image](https://cloud.githubusercontent.com/assets/1193966/16918417/d4d533ce-4d37-11e6-92ec-1e13ad5e15d6.png)
 ===============
 
-`iMoney.js`是一个移动端基础脚本框架。
+iMoney.js是一个移动端基础脚本框架。
+
+![image](https://cloud.githubusercontent.com/assets/1193966/16918417/d4d533ce-4d37-11e6-92ec-1e13ad5e15d6.png)
 
 
 ##快速上手
