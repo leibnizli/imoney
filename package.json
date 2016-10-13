@@ -1,11 +1,17 @@
 {
-    "name": "iMoney.js",
-    "version": "v1.1.0",
-    "description": "JavaScript iMoney库",
+    "name": "imoney",
+    "version": "0.0.1",
+    "description": "iMoney is a minimalist JavaScript library for modern browsers  with a largely jQuery-compatible API.",
+    "main": "index.js",
+    "scripts": {
+        "build": "webpack --watch --progress --colors",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
     "author": "Thunk",
-    "url": "http://imoney.w3cmm.com/",
+    "license": "ISC",
     "devDependencies": {
-        "grunt": "~0.4.1",
-        "grunt-contrib-uglify": "~0.2.2"
+        "body-parser": "^1.15.2",
+        "express": "^4.14.0",
+        "multer": "^1.2.0"
     }
 }
