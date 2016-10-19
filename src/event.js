@@ -96,4 +96,3 @@ iMoney.fn.extend({
         })
     }
 });
-return iMoney;

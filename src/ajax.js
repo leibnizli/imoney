@@ -129,4 +129,3 @@ iMoney.extend({
         return xhr
     }
 });
-return iMoney;

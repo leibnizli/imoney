@@ -19,5 +19,4 @@ iMoney.extend({
     isSupport: function(prop) {
         return support(prop)
     }
-})
-return iMoney;
+});

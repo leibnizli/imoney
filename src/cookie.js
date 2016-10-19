@@ -38,5 +38,4 @@ iMoney.extend({
             expires: -1
         }));
     }
-})
-return iMoney;
+});

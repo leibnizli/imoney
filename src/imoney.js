@@ -643,3 +643,9 @@
         window.iMoney = window.$ = iMoney;
     }
 })(window);
+require("./event.js");
+require("./ajax.js");
+require("./cookie.js");
+require("./form.js");
+require("./support.js");
+require("./module.js");

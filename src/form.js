@@ -53,4 +53,3 @@ iMoney.fn.extend({
         return serialize(this[0]);
     }
 })
-return iMoney;
