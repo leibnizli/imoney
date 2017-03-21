@@ -3,6 +3,10 @@
 
 `iMoney.js` is a minimalist JavaScript library for modern browsers  with a largely jQuery-compatible API.
 
+## Browser support
+
+IE9+
+
 ## Install
 
 ```
