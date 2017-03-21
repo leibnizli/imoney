@@ -5,7 +5,9 @@
 
 ## Install
 
-    npm install imoney
+```
+npm install imoney
+```
 
 ## Usage
 
@@ -15,7 +17,7 @@
 ```
 
 ```js
-require("imoney");
+var $ = require("imoney");
 
 var $result = $("#result");
 $result.attr({

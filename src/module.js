@@ -1,3 +1,4 @@
+var iMoney = require("./imoney");
 (function() {
     var require, define, baseElement, currentlyAddingScript,
         globalDefQueue = [],

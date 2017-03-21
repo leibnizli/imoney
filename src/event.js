@@ -1,3 +1,4 @@
+var iMoney = require("./imoney");
 var getEvents = function (element) {
     return element.eventListeners
 };

@@ -4,7 +4,22 @@
  * Url: https://github.com/stormtea123/iMoney
  * Time: 2015-06-03 4:09:00 PM 
  */
-(function(window, undefined) {
+(function(global, factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        module.exports = global.document ?
+            factory(global, true) :
+            function(w) {
+                if (!w.document) {
+                    throw new Error("iMoney requires a window with a document");
+                }
+                return factory(w);
+            };
+    } else {
+        factory(global);
+    }
+
+    // Pass this if window is not defined yet
+})(typeof window !== "undefined" ? window : this, function(window, noGlobal) {
     var rootiMoney, classList,
         _$ = window.$,
         classCache = {},
@@ -639,12 +654,8 @@
             })
         }
     });
-    if (typeof window === "object" && typeof window.document === "object") {
+    if (!noGlobal) {
         window.iMoney = window.$ = iMoney;
     }
-})(window);
-require("./event.js");
-require("./ajax.js");
-require("./cookie.js");
-require("./form.js");
-require("./support.js");
+    return iMoney;
+});

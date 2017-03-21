@@ -1,3 +1,4 @@
+var iMoney = require("./imoney");
 var support = (function() {
     var div = document.createElement('div'),
         vendors = 'Khtml Ms O Moz Webkit'.split(' '),

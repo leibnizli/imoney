@@ -1,6 +1,6 @@
 {
     "name": "imoney",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "iMoney is a minimalist JavaScript library for modern browsers  with a largely jQuery-compatible API.",
     "main": "index.js",
     "scripts": {
