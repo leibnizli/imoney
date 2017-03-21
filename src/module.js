@@ -520,6 +520,6 @@
     iMoney.config = function(config) {
         return require(config);
     }
-    window.define = iMoney.define = define;
-    window.require = iMoney.require = require;
+    iMoney.define = define;
+    iMoney.require = require;
 })();
