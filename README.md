@@ -32,4 +32,4 @@ $result.html("<p>Hello World</p>") ;
 
 ## API
 
-[https://github.com/stormtea123/iMoney/wiki](https://github.com/stormtea123/iMoney/wiki)
+[https://github.com/imoney-team/imoney/wiki](https://github.com/imoney-team/imoney/wiki)
