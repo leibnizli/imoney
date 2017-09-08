@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>iMoney demo</title>
+    <script src="../build/imoney.js"></script>
+    <style>
+        .content {border:solid 1px red; }
+        #result { background:#bbb; }
+    </style>
+</head>
+
+<body>
+    <ul>
+        <li></li>
+        <li class="test"></li>
+        <li></li>
+    </ul>
+    <div id="result" test="123" class="some test" style="width:100px; height:100px;">
+        <p class="content1">content</p>
+        <p class="content">conten2t</p>
+    </div>
+    <form name="login" id="login">
+        <input type="text" value="123" name="name">
+    </form>
+    <script>
+    //var $li = $("li");
+    // console.log($li);
+    // [].some.call($li,function(el){
+    //     console.log(this)
+    //     console.log(el)
+    // })
+    //var $result = $("#result");
+    //console.log($result.children(".content1"))
+    //$result.addClass("some test");
+    //$result.removeClass("test some")
+    //console.log( $result.css(["width","height"]))
+    // $result.css({
+    //     width:"200px",
+    //     height:"300px"
+    // })
+    // var test = $result.attr("test");
+    // console.log(test);
+    // $result.removeAttr("test")
+    //function test(){
+    //    console.log(arguments)
+    //}
+    //test("a","b")
+    //var result = document.getElementById("result");
+    // var a = $.isPlainObject({name:"张三"});
+    // console.log(a)
+    //console.log(result)
+    //console.log(result.className)
+    //$result.data("name","张三");
+    //$result.data("name");
+    //var json = $.stringifyJSON({name:"张三"});
+    //$result.html(json)
+    //$result.append("append");
+    //$result.after("after");
+    //$result.prepend("prepend");
+    //$result.before("before");
+    //$result.remove();
+    // $.require(["../src/event"],function(){
+    //     $result.on("touchstart.name",function(){
+    //         $result.off("name");
+    //         console.log("张三")
+    //     })
+        
+    // })
+    //配置包
+    // $.config({
+    //     baseUrl: "modules",
+    //     paths: {
+    //         "name": "model/getName"
+    //     },
+    //     waitSeconds: 3,
+    //     urlArgs: 't='+ Date.now()
+    // });
+    //使用2模块
+    //一个基于baseUrl的hello模块，一个基于baseUrl+paths规则定义的name模块
+    // $.require(["modules/hello"], function(Hello,Name) {
+    //     console.log("main")
+    //     return {}
+    //     //此处可以使用类似Zepto的相关api进行业务逻辑操作
+    //     //API地址: http://imoney.w3cmm.com/
+    //     // var $result = $("#result");
+    //     // $result.attr({
+    //     //     title:"这里显示的是结果"
+    //     // });
+    //     //$("#result").html('<p>' + Hello.say + '</p><p>这里是' + Name.say + '</p>') ;
+    // });
+    //form
+    // $.require(["../src/form"],function(){
+    //     var xhr = new XMLHttpRequest();
+    //     xhr.open("post", "server.php");
+    //     xhr.send($("#login").serialize());
+    // })
+    </script>
+</body>
+
+</html>
