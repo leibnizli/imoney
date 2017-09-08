@@ -165,9 +165,7 @@ iMoney.fn.extend({
     delegate:function delegate(type, selector, callback, useCapture) {
         var element = this[0];
         var listenerFn = listener.apply(this, [element,type, selector, callback, useCapture]);
-
         element.addEventListener(type, listenerFn, useCapture);
-
         return {
             destroy: function() {
                 element.removeEventListener(type, listenerFn, useCapture);
