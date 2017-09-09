@@ -14,8 +14,10 @@
 </head>
 
 <body>
-<div id="result" test="123" class="some test" style="width:100px; height:100px;"></div>
-<button class="btn">delegate</button>
+<div id="result" style="width:100px; height:100px;"></div>
+<div class="test">
+    <button class="btn">delegate</button>
+</div>
 <script>
 
     var $result = $("#result");
@@ -36,9 +38,12 @@
         console.log("--touchend");
     });
 
-    $(document.body).delegate('click', '.btn', function (e) {
+    var hanlde = $(document.body).delegate('click', '.test', function (e) {
+        console.log(e.currentTarget);
         console.log(e.delegateTarget);
+        hanlde.destroy()
     }, false);
+    console.log(hanlde)
 </script>
 </body>
 
