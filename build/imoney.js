@@ -70,7 +70,7 @@
 /**
  * Name: iMoney.js v0.0.1
  * Author: Thunk
- * Url: https://github.com/stormtea123/iMoney
+ * Url: https://github.com/thunkli/iMoney
  * Time: 2015-06-03 4:09:00 PM 
  */
 (function(global, factory) {
@@ -723,9 +723,7 @@
             })
         }
     });
-    if (!noGlobal) {
-        window.iMoney = window.$ = iMoney;
-    }
+    window.iMoney = window.$ = iMoney;
     return iMoney;
 });
 
@@ -744,8 +742,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-// import "./src/form.js";
-// import "./src/support.js";
 
 
 /* harmony default export */ __webpack_exports__["default"] = (__WEBPACK_IMPORTED_MODULE_3__src_imoney_js___default.a);
@@ -817,6 +813,61 @@ var removeMatchedEvents = function(el, namedHandler) {
         getEventsToRemove(el, event).forEach(removeEvent(el, namedHandler))
     }
 }
+
+// delegate
+
+var DOCUMENT_NODE_TYPE = 9;
+
+/**
+ * A polyfill for Element.matches()
+ */
+if (typeof Element !== 'undefined' && !Element.prototype.matches) {
+    var proto = Element.prototype;
+
+    proto.matches = proto.matchesSelector ||
+        proto.mozMatchesSelector ||
+        proto.msMatchesSelector ||
+        proto.oMatchesSelector ||
+        proto.webkitMatchesSelector;
+}
+
+/**
+ * Finds the closest parent that matches a selector.
+ *
+ * @param {Element} element
+ * @param {String} selector
+ * @return {Function}
+ */
+function closest (element, selector) {
+    while (element && element.nodeType !== DOCUMENT_NODE_TYPE) {
+        if (typeof element.matches === 'function' &&
+            element.matches(selector)) {
+            return element;
+        }
+        element = element.parentNode;
+    }
+}
+
+
+/**
+ * Finds closest match and invokes callback.
+ *
+ * @param {Element} element
+ * @param {String} selector
+ * @param {String} type
+ * @param {Function} callback
+ * @return {Function}
+ */
+function listener(element, type, selector, callback) {
+    return function(e) {
+        e.delegateTarget = closest(e.target, selector);
+
+        if (e.delegateTarget) {
+            callback.call(element, e);
+        }
+    }
+}
+
 __WEBPACK_IMPORTED_MODULE_0__imoney___default.a.fn.extend({
     on: function (events, handler) {
         if (handler) {
@@ -855,6 +906,26 @@ __WEBPACK_IMPORTED_MODULE_0__imoney___default.a.fn.extend({
             }
             Object.keys(getEvents(this)).forEach(removeEvent(this))
         })
+    },
+    /**
+     * Delegates event to a selector.
+     *
+     * @param {Element} element
+     * @param {String} selector
+     * @param {String} type
+     * @param {Function} callback
+     * @param {Boolean} useCapture
+     * @return {Object}
+     */
+    delegate:function delegate(type, selector, callback, useCapture) {
+        var element = this[0];
+        var listenerFn = listener.apply(this, [element,type, selector, callback, useCapture]);
+        element.addEventListener(type, listenerFn, useCapture);
+        return {
+            destroy: function() {
+                element.removeEventListener(type, listenerFn, useCapture);
+            }
+        }
     }
 });
 

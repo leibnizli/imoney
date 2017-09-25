@@ -6,7 +6,7 @@ module.exports = [{
         imoney: "./index.js",
     },
     output: {
-        path: path.resolve(__dirname, 'build'),
+        path: path.resolve(__dirname, "build"),
         publicPath: "build/",
         filename: "[name].js"
     }
@@ -16,7 +16,7 @@ module.exports = [{
         imoney: "./index.js",
     },
     output: {
-        path: path.resolve(__dirname, 'build'),
+        path: path.resolve(__dirname, "build"),
         publicPath: "build/",
         filename: "[name].min.js"
     },

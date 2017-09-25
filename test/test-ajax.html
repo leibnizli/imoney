@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>iMoney test</title>
+    <script src="../src/imoney.js"></script>
+</head>
+
+<body>
+    <script>
+        $.ajax({
+            dataType: "jsonp",
+            url: "jsonp.php",
+            type: "get",
+            data: {
+                name: "iMoney",
+                say:"hello"
+            },
+            success: function(data) {
+                console.log(data)
+            }
+        })
+    </script>
+</body>
+
+</html>

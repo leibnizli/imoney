@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>iMoney test</title>
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+    <style>
+        #result {
+            background: #bbb;
+        }
+    </style>
+    <script src="../build/imoney.js"></script>
+</head>
+
+<body>
+<div id="result" style="width:100px; height:100px;"></div>
+<div class="test">
+    <button class="btn">delegate</button>
+</div>
+<script>
+
+    var $result = $("#result");
+    var i = 0;
+    //绑定命名空间
+    $result.on("touchstart.name", function () {
+        i++;
+        if (i >= 2) {
+            //基于命名空间移除事件
+            $result.off("name");
+        }
+        console.log("iMoney.js");
+    });
+    //绑定事件
+    $result.on("touchend", function () {
+        //移除事件
+        $result.off("touchend");
+        console.log("--touchend");
+    });
+
+    var hanlde = $(document.body).delegate('click', '.test', function (e) {
+        console.log(e.currentTarget);
+        console.log(e.delegateTarget);
+        hanlde.destroy()
+    }, false);
+    console.log(hanlde)
+</script>
+</body>
+
+</html>

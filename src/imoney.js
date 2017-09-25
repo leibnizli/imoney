@@ -1,7 +1,7 @@
 /**
  * Name: iMoney.js v0.0.1
  * Author: Thunk
- * Url: https://github.com/stormtea123/iMoney
+ * Url: https://github.com/thunkli/iMoney
  * Time: 2015-06-03 4:09:00 PM 
  */
 (function(global, factory) {
@@ -654,8 +654,6 @@
             })
         }
     });
-    if (!noGlobal) {
-        window.iMoney = window.$ = iMoney;
-    }
+    window.iMoney = window.$ = iMoney;
     return iMoney;
 });
