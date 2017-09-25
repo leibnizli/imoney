@@ -1,4 +1,5 @@
-var iMoney = require("./imoney");
+import iMoney from "./imoney";
+
 var serialize = function(form) {
     var parts = [],
         field = null,

@@ -1,4 +1,5 @@
-var iMoney = require("./imoney");
+import iMoney from "./imoney";
+
 var jsonpID = 0;
 var defaults = {
     type: 'GET',

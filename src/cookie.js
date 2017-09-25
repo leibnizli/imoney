@@ -1,4 +1,5 @@
-var iMoney = require("./imoney");
+import iMoney from "./imoney";
+
 iMoney.extend({
     cookie: function(key, value, options) {
         if (1 in arguments) {

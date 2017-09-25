@@ -1,4 +1,5 @@
-var iMoney = require("./imoney");
+import iMoney from "./imoney";
+
 (function() {
     var require, define, baseElement, currentlyAddingScript,
         globalDefQueue = [],
