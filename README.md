@@ -28,7 +28,7 @@ $result.html("<p>Hello World</p>") ;
 
 ## API
 
-[https://github.com/thunkli/imoney/wiki](https://github.com/thunkli/imoney/wiki)
+[https://github.com/leibnizli/imoney/wiki](https://github.com/leibnizli/imoney/wiki)
 
 ## Browser support
 
