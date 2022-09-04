@@ -1,7 +1,7 @@
 var webpack = require('webpack');
 var path = require('path');
 module.exports = [{
-    name: "develop",
+    name: "dev",
     entry: {
         imoney: "./index.js",
     },

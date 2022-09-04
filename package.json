@@ -1,6 +1,6 @@
 {
     "name": "imoney",
-    "version": "0.0.4",
+    "version": "2.0.1",
     "description": "iMoney is a minimalist JavaScript library for modern browsers  with a largely jQuery-compatible API.",
     "main": "build/imoney.min.js",
     "unpkg": "build/imoney.min.js",
@@ -9,7 +9,7 @@
         "build": "webpack --watch --progress --colors",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author": "thunkli",
+    "author": "leibnizli",
     "license": "ISC",
     "devDependencies": {
         "webpack": "^3.3.0"
